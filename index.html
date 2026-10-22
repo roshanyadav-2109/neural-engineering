@@ -336,17 +336,17 @@
 
   /* ---------- closing: headline + playable block word ---------- */
   .cta { position: relative; height: 100svh; min-height: 640px; overflow: hidden; background: #fff; }
-  #arena { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; outline: none; }
-  .cta.playing #arena { cursor: none; }
+  #arena { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; outline: none; }
+  .cta.playing #arena { cursor: none; touch-action: none; }
   .cta-copy { position: relative; z-index: 2; padding-top: clamp(96px, 14svh, 150px); pointer-events: none; transition: opacity .5s var(--ease), transform .6s var(--ease); }
   .cta-copy h2 { font-size: clamp(56px, 9.5vw, 160px); }
   @media (max-width: 760px) {
-    .cta { height: 640px; min-height: 0; }
+    .cta { height: min(100svh, 860px); min-height: 700px; }
     .cta-copy { padding-top: 132px; }
     .cta-copy h2 { font-size: 52px; }
     .cta-actions { gap: 16px; }
-    .cta-hint { top: 96px; font-size: 12px; white-space: normal; text-align: center; width: calc(100% - 32px); }
-    .cta-takeover { top: 96px; left: 16px; right: auto; font-size: 12px; }
+    .cta .cta-hint { top: 168px; font-size: 12px; white-space: normal; text-align: center; width: calc(100% - 32px); }
+    .cta-takeover { display: none; }
   }
   .cta-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; pointer-events: auto; }
   .cta-mail { align-self: center; font-size: 18px; font-weight: 500; border-bottom: 1.5px solid currentColor; padding-bottom: 2px; transition: color .3s; }
@@ -939,12 +939,14 @@
     const WORD = "next.";
     const bayer = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
     const isTouch = matchMedia("(hover: none)").matches;
-    if (isTouch) {
+    if (isTouch || innerWidth < 700) {
       hint.textContent = "Tap left or right to move · centre to fly · auto fire";
       takeoverEl.textContent = "Tap to take control";
     }
 
-    let W, H, T, cols, rows, grid = [], assembling = false;
+    let W, H, T, cols, rows, grid = [], assembling = false, narrow = false;
+    const copyEl = sec.querySelector(".cta-copy");
+    const TAP_HINT = "Tap the blocks to play.";
 
     function layout() {
       W = canvas.clientWidth; H = canvas.clientHeight;
@@ -961,17 +963,34 @@
       // rasterise the word at one pixel per tile; every filled pixel becomes a block
       const off = document.createElement("canvas"); off.width = cols; off.height = rows;
       const o = off.getContext("2d", { willReadFrequently: true });
+      // phones stack the word as "ne" / "xt." so the blocks stay big enough to read and play on
+      narrow = W < 700;
+      const lines = narrow ? ["ne", "xt."] : [WORD];
       o.font = `700 100px ${FONT}`;
-      const m = o.measureText(WORD);
-      const size = Math.floor(100 * Math.min(cols * .9 / m.width, rows * .44 / m.actualBoundingBoxAscent));
+      const ms = lines.map(l => o.measureText(l));
+      const maxW = Math.max(...ms.map(m => m.width));
+      const ascents = ms.map(m => m.actualBoundingBoxAscent);
+      let fitH = rows * .44 / ascents[0], gap = 0;
+      if (narrow) {
+        const copyBottom = copyEl.getBoundingClientRect().bottom - canvas.getBoundingClientRect().top;
+        const avail = groundTop - Math.ceil(copyBottom / T) - 2;
+        gap = 2;
+        fitH = (avail - gap) / (ascents[0] + ascents[1]);
+      }
+      const size = Math.floor(100 * Math.min(cols * .9 / maxW, fitH));
       o.font = `700 ${size}px ${FONT}`;
-      const x0 = Math.round((cols - o.measureText(WORD).width) / 2);
-      const dotX = x0 + o.measureText("next").width;
-      o.fillText(WORD, x0, groundTop);
+      const baselines = [];
+      let base = groundTop;
+      for (let i = lines.length - 1; i >= 0; i--) { baselines[i] = base; base -= Math.round(ascents[i] * size / 100) + gap; }
+      lines.forEach((l, i) => o.fillText(l, Math.round((cols - o.measureText(l).width) / 2), baselines[i]));
+      // the full stop sits on the last line, right of the letters before it
+      const last = lines[lines.length - 1];
+      const dotX = Math.round((cols - o.measureText(last).width) / 2) + o.measureText(last.replace(".", "")).width;
+      const dotTop = lines.length > 1 ? baselines[lines.length - 2] : 0;
       const px = o.getImageData(0, 0, cols, rows).data;
       for (let r = 0; r < groundTop; r++) for (let c = 0; c < cols; c++) {
         if (px[(r * cols + c) * 4 + 3] > 120) {
-          grid[r * cols + c] = { kind: "word", alive: true, hp: 3, t: 0, delay: c * .018 + Math.random() * .35, flash: 0, respawn: 0, total: 1, dot: c >= dotX };
+          grid[r * cols + c] = { kind: "word", alive: true, hp: 3, t: 0, delay: c * .018 + Math.random() * .35, flash: 0, respawn: 0, total: 1, dot: c >= dotX && r > dotTop };
         }
       }
     }
@@ -1183,7 +1202,7 @@
         ctx.font = `600 28px ${FONT}`; ctx.fillStyle = INK; ctx.textAlign = "right";
         ctx.fillText(String(score).padStart(4, "0"), W - 24, top + 24);
         bar(W - 164, top + 38, player.hp / 100, INK); bar(W - 164, top + 50, player.fuel, ORANGE);
-        if (!touch && !isTouch) {
+        if (!touch && !isTouch && !narrow) {
           ctx.strokeStyle = INK; ctx.lineWidth = 1.5; ctx.beginPath();
           ctx.arc(mouse.x, mouse.y, 9, 0, Math.PI * 2);
           [[-15, 0, -5, 0], [5, 0, 15, 0], [0, -15, 0, -5], [0, 5, 0, 15]].forEach(([a, b, c, d]) => { ctx.moveTo(mouse.x + a, mouse.y + b); ctx.lineTo(mouse.x + c, mouse.y + d); });
@@ -1198,17 +1217,20 @@
       score = 0; spawnT = .8; player.hp = 100; player.fuel = 1;
       state = "play"; sec.classList.add("playing");
       scoreEl.textContent = "";
+      // on phones the section fills the screen, so line it up to keep the score clear of the nav
+      if (narrow) sec.scrollIntoView({ behavior: "smooth", block: "start" });
       canvas.focus({ preventScroll: true });
     }
     function end(died) {
       state = "auto"; sec.classList.remove("playing"); mouse.down = false; keys.clear();
       best = Math.max(best, score);
       if (died) scoreEl.textContent = `You scored ${score}. Best ${best}.`;
+      else if (narrow) scoreEl.textContent = TAP_HINT;
       cursorEl.style.opacity = 1;
       if (died) { player.hp = 0; setTimeout(spawnPlayer, 900); }
     }
 
-    function init() { layout(); spawnPlayer(); }
+    function init() { layout(); spawnPlayer(); if (narrow) scoreEl.textContent = TAP_HINT; }
     (document.fonts ? document.fonts.ready : Promise.resolve()).then(init);
     let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { layout(); spawnPlayer(); }, 150); });
 
@@ -1223,14 +1245,23 @@
 
     const pos = e => { const r = canvas.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; };
     canvas.addEventListener("pointermove", pos);
+    let tapStart = null;
     canvas.addEventListener("pointerdown", e => {
       pos(e);
       if (!player || player.hp <= 0) return;
+      if (e.pointerType !== "mouse" && state !== "play") { tapStart = { x: e.clientX, y: e.clientY, t: performance.now() }; return; }
       takeOver();
       cursorEl.style.opacity = 0;
-      if (e.pointerType === "touch") touch = mouse.x < W / 3 ? "left" : mouse.x > W * 2 / 3 ? "right" : "jet";
+      if (e.pointerType !== "mouse") touch = mouse.x < W / 3 ? "left" : mouse.x > W * 2 / 3 ? "right" : "jet";
       else mouse.down = true;
     });
+    canvas.addEventListener("pointerup", e => {
+      if (!tapStart) return;
+      const moved = Math.hypot(e.clientX - tapStart.x, e.clientY - tapStart.y);
+      if (moved < 10 && performance.now() - tapStart.t < 400) takeOver();
+      tapStart = null;
+    });
+    canvas.addEventListener("pointercancel", () => { tapStart = null; });
     addEventListener("pointerup", () => { mouse.down = false; touch = null; });
     canvas.addEventListener("pointerenter", () => { if (state === "play") cursorEl.style.opacity = 0; });
     canvas.addEventListener("pointerleave", () => { cursorEl.style.opacity = 1; mouse.down = false; });

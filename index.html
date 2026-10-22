@@ -1,0 +1,1252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neural Engineering | We build your AI product</title>
+<meta name="description" content="We engineer AI operating systems, platforms and products for enterprises, institutions and governments.">
+<link rel="icon" href="assets/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@300..800&family=Inter:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --paper: #f4f4f1;
+    --ink: #0b0b0b;
+    --mute: #6d6d68;
+    --line: #e4e4df;
+    --red: #ff5a1f;
+    --orange: #ff8a5c;
+    --yellow: #ffc2a8;
+    --green: #ff5a1f;
+    --ease: cubic-bezier(.2, .8, .2, 1);
+    --spring: cubic-bezier(.34, 1.56, .64, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Host Grotesk", "Helvetica Neue", Arial, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  .mono { font-size: 14px; font-weight: 500; letter-spacing: 0; }
+  .serif { color: #a3a3a6; }
+  .dot { color: var(--red); }
+  .wrap { width: min(1320px, 100% - 48px); margin-inline: auto; }
+
+  /* ---------- cursor ---------- */
+  .cursor {
+    position: fixed; top: 0; left: 0; width: 12px; height: 12px; border-radius: 50%;
+    background: var(--ink); pointer-events: none; z-index: 100;
+    transform: translate(-50%, -50%); transition: width .3s var(--ease), height .3s var(--ease), background .3s;
+    mix-blend-mode: difference; filter: invert(1);
+  }
+  .cursor.big { width: 56px; height: 56px; }
+  @media (hover: none) { .cursor { display: none; } }
+
+  /* ---------- nav ---------- */
+  nav {
+    position: fixed; inset: 0 0 auto; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px; transition: background .4s, backdrop-filter .4s;
+  }
+  nav.scrolled { background: rgba(255,255,255,.75); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+  /* wordmark mirrors neuralai.in: lowercase "neural", Inter semibold, tight tracking */
+  .logo { display: flex; align-items: baseline; gap: 8px; }
+  .logo-word { font-family: "Inter", sans-serif; font-weight: 600; font-size: 30px; letter-spacing: -.025em; line-height: 1; color: var(--ink); }
+  .logo-light { font-size: 16px; font-weight: 400; color: #6d6d68; letter-spacing: 0; }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a { position: relative; }
+  .nav-links a::after { content: ""; position: absolute; left: 0; bottom: -4px; height: 1px; width: 100%; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform .4s var(--ease); }
+  .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px; padding: 14px 22px;
+    background: var(--ink); color: #fff; font-weight: 600; font-size: 15px;
+    position: relative; overflow: hidden; isolation: isolate;
+  }
+  .btn::before { content: ""; position: absolute; inset: 0; background: var(--red); transform: translateY(101%); transition: transform .5s var(--ease); z-index: -1; }
+  .btn:hover::before { transform: translateY(0); }
+  .btn .arr { transition: transform .4s var(--ease); }
+  .btn:hover .arr { transform: translateX(4px) rotate(-45deg); }
+  .btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
+  .btn.ghost:hover { color: #fff; }
+  .btn.ghost::before { background: var(--ink); }
+  @media (max-width: 760px) { .nav-links { display: none; } }
+
+  /* ---------- hero ---------- */
+  .hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+  #pixels { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hero-inner { position: relative; z-index: 2; padding-top: 80px; padding-bottom: 32vh; }
+  .hero .kicker { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; opacity: 0; animation: fadeUp 1s .2s var(--ease) forwards; }
+  .hero .kicker::before { content: ""; width: 8px; height: 8px; background: var(--red); }
+  h1 {
+    font-size: clamp(52px, 10.5vw, 168px); line-height: .98; letter-spacing: -.04em;
+    font-weight: 600;
+  }
+  h1 .line { display: block; overflow: hidden; padding-bottom: .06em; }
+  h1 .line > span { display: inline-block; transform: translateY(110%); animation: rise 1.2s var(--ease) forwards; }
+  h1 .line:nth-child(2) > span { animation-delay: .12s; }
+  .hero-foot { display: flex; gap: 40px; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; margin-top: 40px; }
+  .hero-foot p { max-width: 380px; font-size: 18px; line-height: 1.4; color: #333; opacity: 0; animation: fadeUp 1s .6s var(--ease) forwards; }
+  .hero-ctas { display: flex; gap: 12px; opacity: 0; animation: fadeUp 1s .75s var(--ease) forwards; }
+  @keyframes rise { to { transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+  .scroll-hint { position: absolute; z-index: 3; bottom: 22px; left: 50%; transform: translateX(-50%); color: #fff; mix-blend-mode: difference; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .scroll-hint i { width: 1px; height: 36px; background: currentColor; transform-origin: top; animation: drip 1.8s var(--ease) infinite; }
+  @keyframes drip { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+  /* ---------- ticker ---------- */
+  .ticker { background: var(--ink); color: #fff; overflow: hidden; padding: 18px 0; transform: rotate(-1.5deg) scale(1.03); margin: -10px 0 0; position: relative; z-index: 4; }
+  .ticker-track { display: flex; gap: 48px; width: max-content; animation: marquee 28s linear infinite; }
+  .ticker span { font-weight: 500; font-size: 28px; display: flex; align-items: center; gap: 48px; white-space: nowrap; }
+  .ticker span::after { content: ""; width: 10px; height: 10px; background: var(--red); }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+
+  /* ---------- section heads ---------- */
+  section { position: relative; }
+  .sec { padding: 160px 0; }
+  .sec-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; flex-wrap: wrap; margin-bottom: 80px; }
+  h2 { font-size: clamp(44px, 7vw, 110px); line-height: .98; letter-spacing: -.045em; font-weight: 600; }
+  .label { display: flex; gap: 10px; align-items: center; color: var(--mute); margin-bottom: 20px; }
+  .label b { color: var(--ink); font-weight: 500; }
+
+  [data-reveal] { opacity: 0; transform: translateY(40px); transition: opacity 1s var(--ease), transform 1s var(--ease); }
+  [data-reveal].in { opacity: 1; transform: none; }
+
+  /* ---------- what we do ---------- */
+  .what h2 { margin-bottom: 72px; }
+  .what-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .what-card { background: var(--paper); padding: 36px 32px 40px; min-height: 340px; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; position: relative; overflow: hidden; transition: transform .6s var(--ease), background .4s, opacity 1s var(--ease); }
+  .what-card:hover { background: var(--ink); color: #fff; transform: translateY(-6px); }
+  .what-card h3 { font-size: 44px; font-weight: 600; letter-spacing: -.035em; }
+  .what-card p { font-size: 18px; line-height: 1.4; color: #55555a; max-width: 280px; transition: color .4s; }
+  .what-card:hover p { color: #c9c9cc; }
+  .what-icon { position: absolute; top: 32px; left: 32px; width: 72px; height: 72px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .what-icon i { background: var(--ink); transition: background .4s, transform .6s var(--spring); }
+  .what-card:hover .what-icon i { background: var(--red); }
+  .what-card:hover .what-icon:not(.launch):not(.run) i:nth-child(1) { transform: translate(-6px, -6px); }
+  .what-card:hover .what-icon:not(.launch):not(.run) i:nth-child(4) { transform: translate(6px, 6px); }
+  .what-icon.launch { display: block; }
+  .what-icon.launch i { position: absolute; left: 22px; bottom: 0; width: 28px; height: 28px; animation: hop 1.6s var(--ease) infinite; }
+  @keyframes hop { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-40px); } }
+  .what-icon.run { display: flex; align-items: flex-end; gap: 6px; }
+  .what-icon.run i { width: 20px; animation: eq 1.4s ease-in-out infinite; }
+  .what-icon.run i:nth-child(1) { height: 40%; } .what-icon.run i:nth-child(2) { height: 75%; animation-delay: .2s; } .what-icon.run i:nth-child(3) { height: 100%; animation-delay: .4s; }
+  @keyframes eq { 50% { transform: scaleY(.55); transform-origin: bottom; } }
+  @media (max-width: 860px) { .what-grid { grid-template-columns: 1fr; } .what-card { min-height: 260px; } }
+
+  /* ---------- numbers ---------- */
+  .stats { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .stat { padding: 64px 0 56px; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; padding-left: 32px; }
+  .stat:first-child { padding-left: 0; }
+  .stat:last-child { border-right: 0; }
+  .stat b { font-size: clamp(72px, 9vw, 140px); font-weight: 600; letter-spacing: -.05em; line-height: .9; }
+  .stat span { color: var(--mute); font-size: 17px; }
+  @media (max-width: 760px) { .stats-row { grid-template-columns: 1fr; } .stat { border-right: 0; border-bottom: 1px solid var(--line); padding-left: 0; } }
+
+  /* ---------- FAQ ---------- */
+  .faq-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 40px; align-items: start; }
+  .faq-list { border-top: 1px solid var(--ink); }
+  .faq details { border-bottom: 1px solid var(--line); }
+  .faq summary { list-style: none; cursor: pointer; padding: 26px 48px 26px 0; font-size: clamp(20px, 2vw, 26px); font-weight: 500; letter-spacing: -.02em; position: relative; transition: color .3s; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: ""; position: absolute; right: 8px; top: 50%; width: 16px; height: 16px; margin-top: -8px;
+    background: linear-gradient(var(--ink) 0 0) center / 16px 2px no-repeat, linear-gradient(var(--ink) 0 0) center / 2px 16px no-repeat; transition: transform .4s var(--ease); }
+  .faq details[open] summary::after { transform: rotate(135deg); }
+  .faq summary:hover { color: var(--red); }
+  .faq details p { font-size: 18px; line-height: 1.5; color: #55555a; max-width: 560px; padding-bottom: 28px; animation: fadeUp .5s var(--ease); }
+  @media (max-width: 860px) { .faq-grid { grid-template-columns: 1fr; } }
+
+  /* ---------- work: live product views ---------- */
+  .work-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; }
+  .w-8 { grid-column: span 8; } .w-6 { grid-column: span 6; } .w-4 { grid-column: span 4; }
+  .proj { display: flex; flex-direction: column; gap: 18px; }
+  .stage { background: var(--paper); height: clamp(340px, 34vw, 500px); display: grid; place-items: center; padding: 32px; position: relative; overflow: hidden; transition: background .5s; }
+  .proj:hover .stage { background: #ecece8; }
+
+  /* browser frame */
+  .browser { width: 100%; max-width: 760px; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 24px 50px -18px rgba(0,0,0,.28); transform: translateY(0); transition: transform .7s var(--ease), box-shadow .7s var(--ease); }
+  .proj:hover .browser, .proj:hover .phone { transform: translateY(-8px); }
+  .bar { display: flex; align-items: center; gap: 6px; padding: 10px 12px; background: #f6f6f4; border-bottom: 1px solid var(--line); }
+  .bar i { width: 9px; height: 9px; border-radius: 50%; background: #dcdcd7; }
+  .bar span { margin-left: 10px; flex: 1; max-width: 300px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; font-size: 12px; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .shot { position: relative; overflow: hidden; aspect-ratio: 16 / 10; background: #fff; }
+  .shot img { display: block; width: 100%; height: auto; will-change: transform; }
+
+  /* phone frame */
+  .phone { height: 100%; aspect-ratio: 9 / 19; max-height: 460px; background: var(--ink); border-radius: 38px; padding: 9px; box-shadow: 0 24px 50px -18px rgba(0,0,0,.35); position: relative; transition: transform .7s var(--ease); }
+  .phone::before { content: ""; position: absolute; top: 16px; left: 50%; transform: translateX(-50%); width: 30%; height: 18px; border-radius: 12px; background: var(--ink); z-index: 2; }
+  .phone .shot { aspect-ratio: auto; height: 100%; border-radius: 30px; }
+
+  /* projects without a public link yet */
+  .stage.dark { background: var(--ink); color: #fff; place-items: stretch; padding: 36px; }
+  .proj:hover .stage.dark { background: #1a1a1d; }
+  .dark-in { display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
+  .dark-in .big { font-size: clamp(56px, 7vw, 112px); font-weight: 600; letter-spacing: -.05em; line-height: .9; }
+  .dark-in .tag { color: #8d8d92; font-size: 14px; }
+  .dark-in .big.sm, .w-4 .dark-in .big { font-size: clamp(44px, 4.6vw, 76px); }
+  .dark-grid { position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,.08) 1px, transparent 1px); background-size: 22px 22px; pointer-events: none; }
+  .dark-dot { position: absolute; right: 36px; top: 36px; width: 14px; height: 14px; background: var(--red); animation: blink2 2.4s steps(1) infinite; }
+  @keyframes blink2 { 50% { opacity: .25; } }
+
+  .meta { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+  .meta h3 { font-size: 28px; font-weight: 600; letter-spacing: -.03em; }
+  .meta .cat { color: var(--mute); font-size: 15px; margin-top: 4px; }
+  .meta a { font-size: 15px; font-weight: 500; border-bottom: 1px solid currentColor; white-space: nowrap; }
+  .meta a:hover { color: var(--red); }
+  @media (max-width: 960px) {
+    .w-8, .w-6, .w-4 { grid-column: span 12; }
+    .stage { height: 420px; padding: 20px; }
+  }
+
+  /* ---------- build / process ---------- */
+  .build { height: 460vh; background: var(--paper); }
+  .build-sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; display: grid; grid-template-columns: minmax(300px, .8fr) 1.2fr; align-items: center; gap: 40px; padding: 90px 4vw 40px; }
+  .build-sticky::before { content: ""; position: absolute; inset: 0; background-image: linear-gradient(#e6e6e2 1px, transparent 1px), linear-gradient(90deg, #e6e6e2 1px, transparent 1px); background-size: 48px 48px; mask: radial-gradient(ellipse at 70% 50%, #000 20%, transparent 75%); }
+  .build-copy { position: relative; z-index: 2; }
+  .build-copy h2 { margin-bottom: 48px; }
+  .phases { list-style: none; border-left: 1px solid var(--line); position: relative; }
+  .phases .bar { position: absolute; left: -1px; top: 0; width: 2px; height: 0; background: var(--ink); transition: height .2s linear; }
+  .phase { padding: 12px 0 12px 24px; cursor: pointer; }
+  .phase .row { display: flex; align-items: baseline; gap: 14px; }
+  .phase .mono { color: #b0b0aa; transition: color .4s; }
+  .phase h4 { font-size: clamp(26px, 2.6vw, 40px); font-weight: 600; letter-spacing: -.02em; color: #c4c4be; transition: color .4s, transform .5s var(--ease); }
+  .phase p { max-height: 0; overflow: hidden; opacity: 0; color: var(--mute); font-size: 16px; line-height: 1.4; transition: max-height .5s var(--ease), opacity .5s, margin .5s; max-width: 320px; }
+  .phase.on h4 { color: var(--ink); transform: translateX(6px); }
+  .phase.on .mono { color: var(--ink); }
+  .phase.on p { max-height: 60px; opacity: 1; margin-top: 6px; }
+  .phase:hover h4 { color: var(--ink); }
+  #buildCanvas { position: relative; z-index: 1; width: 100%; height: min(78svh, 720px); }
+  .build-meta { position: absolute; right: 4vw; bottom: 32px; z-index: 2; display: flex; gap: 24px; color: var(--mute); }
+  .build-meta b { color: var(--ink); font-weight: 500; }
+  @media (max-width: 860px) {
+    .build-sticky { grid-template-columns: 1fr; grid-template-rows: auto 1fr; padding-top: 80px; gap: 0; }
+    .build-copy h2 { margin-bottom: 16px; font-size: 40px; }
+    .phase { padding: 6px 0 6px 16px; } .phase p { display: none; }
+    #buildCanvas { height: 46svh; }
+    .build-meta { display: none; }
+  }
+
+  /* ---------- map ---------- */
+  .footprint { display: grid; grid-template-columns: 1fr 1.25fr; gap: 40px; align-items: center; }
+  .footprint-copy p { font-size: 18px; color: #444; line-height: 1.45; max-width: 380px; margin-top: 28px; }
+  .map-box { position: relative; aspect-ratio: 1 / 1.05; }
+  .map-box svg.map { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 18px 30px rgba(0,0,0,.12)); }
+  .india { stroke: #fff; stroke-width: 14; stroke-linejoin: round; paint-order: stroke; fill: var(--red);
+    stroke-dasharray: var(--len); stroke-dashoffset: var(--len); fill-opacity: 0; transition: stroke-dashoffset 2.2s var(--ease), fill-opacity 1s .9s; }
+  .india-ink { fill: none; stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: var(--len); stroke-dashoffset: var(--len); transition: stroke-dashoffset 2.2s var(--ease), opacity .8s 1.6s; }
+  .map-box.in .india, .map-box.in .india-ink { stroke-dashoffset: 0; fill-opacity: 1; }
+  .map-box.in .india-ink { opacity: 0; }
+  .pin { opacity: 0; transform: translateY(-30px); transition: all .7s var(--spring); transform-box: fill-box; }
+  .map-box.in .pin { opacity: 1; transform: none; }
+  .pin .ring { fill: none; stroke: var(--green); stroke-width: 2; animation: ring 2s ease-out infinite; transform-origin: center; transform-box: fill-box; }
+  @keyframes ring { from { transform: scale(.6); opacity: 1; } to { transform: scale(2.4); opacity: 0; } }
+  svg.links { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+  svg.links line { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 4 4; opacity: 0; transition: opacity .6s 1.8s; }
+  .map-box.in svg.links line { opacity: .7; }
+
+  .stamp-wrap { position: absolute; width: clamp(120px, 15vw, 176px); filter: drop-shadow(0 10px 16px rgba(0,0,0,.18)); z-index: 2;
+    opacity: 0; transform: translate(var(--fx, 0), -60px) rotate(calc(var(--r) * 3)); transition: transform 1s var(--spring), opacity .6s; }
+  .map-box.in .stamp-wrap { opacity: 1; transform: rotate(var(--r)); }
+  .stamp-wrap:hover { transform: rotate(0deg) scale(1.08) !important; z-index: 5; }
+  .stamp {
+    --p: 6px;
+    background: #fff; padding: calc(2 * var(--p));
+    mask: radial-gradient(var(--p), #0000 98%, #000) round calc(-1.5 * var(--p)) calc(-1.5 * var(--p)) / calc(3 * var(--p)) calc(3 * var(--p)),
+          linear-gradient(#000 0 0) no-repeat 50% / calc(100% - 3 * var(--p)) calc(100% - 3 * var(--p));
+  }
+  .stamp-in { aspect-ratio: 3 / 4; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+  .stamp-in.a { background: #0e0e10; color: #fff; }
+  .stamp-in.b { background: #fff4ef; color: var(--red); }
+  .stamp-in.c { background: var(--red); color: #fff; }
+  .stamp-in.d { background: #f4f4f2; color: var(--ink); }
+  .stamp-in strong { font-size: clamp(16px, 2vw, 24px); font-weight: 700; line-height: .9; letter-spacing: -.02em; text-transform: uppercase; }
+  .stamp-in small { font-size: 10px; line-height: 1.25; opacity: .85; }
+  .stamp-in .glyph { position: absolute; right: -6px; bottom: 34px; width: 62%; opacity: .9; }
+  .stamp-in .script { font-size: 13px; }
+
+  /* ---------- clients wall ---------- */
+  .clients { border-top: 1px solid var(--line); }
+  .client-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .client {
+    height: 170px; display: flex; flex-direction: column; justify-content: space-between; padding: 22px;
+    border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); position: relative; overflow: hidden; isolation: isolate;
+  }
+  .client:nth-child(3n) { border-right: 0; }
+  .client::before { content: ""; position: absolute; inset: 0; background: #fff4ef; z-index: -1; clip-path: circle(0% at var(--mx, 50%) var(--my, 50%)); transition: clip-path .6s var(--ease); }
+  .client:hover::before { clip-path: circle(150% at var(--mx, 50%) var(--my, 50%)); }
+  .client:hover { color: var(--ink); }
+  .client .name { font-size: clamp(20px, 2.2vw, 30px); font-weight: 600; line-height: .95; letter-spacing: -.02em; transition: transform .5s var(--ease); }
+  .client:hover .name { transform: translateX(6px); }
+  .client .mono { color: var(--mute); }
+  .client:hover .mono { color: var(--red); }
+  .client .logo-img { height: 64px; width: auto; max-width: 70%; object-fit: contain; align-self: flex-start; opacity: 1; mix-blend-mode: multiply; transition: filter .5s, transform .5s var(--ease); }
+  .client .logo-img + .name { font-size: 15px; font-weight: 600; letter-spacing: 0; }
+  .client:hover .logo-img { transform: scale(1.06); }
+  .client.no-logo .logo-img { display: none; }
+  .client.no-logo .name { font-size: clamp(20px, 2.2vw, 30px); font-weight: 600; letter-spacing: -.02em; }
+  .client { height: 170px; justify-content: center; gap: 16px; }
+  @media (max-width: 860px) {
+    .client-grid { grid-template-columns: repeat(2, 1fr); }
+    .client:nth-child(3n) { border-right: 1px solid var(--line); }
+    .client:nth-child(2n) { border-right: 0; }
+    .footprint { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- closing: headline + playable block word ---------- */
+  .cta { position: relative; height: 100svh; min-height: 640px; overflow: hidden; background: #fff; }
+  #arena { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; outline: none; }
+  .cta.playing #arena { cursor: none; }
+  .cta-copy { position: relative; z-index: 2; padding-top: clamp(96px, 14svh, 150px); pointer-events: none; transition: opacity .5s var(--ease), transform .6s var(--ease); }
+  .cta-copy h2 { font-size: clamp(56px, 9.5vw, 160px); }
+  .cta-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; pointer-events: auto; }
+  .cta-mail { align-self: center; font-size: 18px; font-weight: 500; border-bottom: 1.5px solid currentColor; padding-bottom: 2px; transition: color .3s; }
+  .cta-mail:hover { color: var(--red); }
+  .faq details p a, footer a { border-bottom: 1px solid currentColor; }
+  footer a:hover, .faq details p a:hover { color: var(--red); }
+  .cta-score { margin-top: 16px; min-height: 1.4em; color: var(--mute); font-size: 16px; }
+  .cta.playing .cta-copy { opacity: .07; transform: translateY(-12px); }
+  .cta.playing .cta-actions { pointer-events: none; }
+  .cta-hint { position: absolute; z-index: 2; left: 50%; top: 96px; transform: translate(-50%, -8px); color: var(--mute); font-size: 13px; opacity: 0; transition: opacity .4s, transform .4s var(--ease); pointer-events: none; white-space: nowrap; }
+  .cta.playing .cta-hint { opacity: 1; transform: translate(-50%, 0); }
+  .cta-takeover { position: absolute; z-index: 2; right: 24px; top: 104px; color: var(--mute); font-size: 13px; transition: opacity .4s; pointer-events: none; }
+  .cta.playing .cta-takeover { opacity: 0; }
+  
+  footer { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 26px 24px; border-top: 1px solid var(--line); color: var(--mute); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+
+<nav id="nav">
+  <a href="#top" class="logo" aria-label="Neural Engineering, back to top"><span class="logo-word">neural</span><span class="logo-light">engineering</span></a>
+  <div class="nav-links mono">
+    <a href="#what">What we do</a><a href="#work">Work</a><a href="#process">How it works</a><a href="#clients">Clients</a><a href="#faq">FAQ</a>
+  </div>
+  <a href="mailto:office@neuralai.in" class="btn">Contact <span class="arr">→</span></a>
+</nav>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="top">
+  <canvas id="pixels"></canvas>
+  <div class="wrap hero-inner">
+    <h1>
+      <span class="line"><span>We build your</span></span>
+      <span class="line"><span>AI product<span class="dot">.</span></span></span>
+    </h1>
+    <div class="hero-foot">
+      <p>You bring the problem. Our engineers design it, build it, launch it and keep it running.</p>
+      <div class="hero-ctas">
+        <a href="#contact" class="btn">Talk to us <span class="arr">→</span></a>
+        <a href="#what" class="btn ghost">See how</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WHAT WE DO ================= -->
+<section class="sec what" id="what">
+  <div class="wrap">
+    <h2 data-reveal>One team.<br><span class="serif">Idea to launch.</span></h2>
+    <div class="what-grid">
+      <article class="what-card" data-reveal>
+        <div class="what-icon"><i></i><i></i><i></i><i></i></div>
+        <h3>Build</h3>
+        <p>We turn your idea into working AI software.</p>
+      </article>
+      <article class="what-card" data-reveal style="transition-delay:.1s">
+        <div class="what-icon launch"><i></i></div>
+        <h3>Launch</h3>
+        <p>We put it in front of real users, safely.</p>
+      </article>
+      <article class="what-card" data-reveal style="transition-delay:.2s">
+        <div class="what-icon run"><i></i><i></i><i></i></div>
+        <h3>Run</h3>
+        <p>We keep it fast, secure and getting better.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WORK ================= -->
+<section class="sec" id="work">
+  <div class="wrap">
+    <div class="sec-head">
+      <div data-reveal>
+        <h2>Things we<br><span class="serif">have built.</span></h2>
+      </div>
+    </div>
+
+    <div class="work-grid">
+      <article class="proj w-8" data-reveal>
+        <div class="stage"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>unknowniitians.com</span></div>
+          <div class="shot"><img src="assets/work/ui.jpg" alt="Unknown IITians website" loading="lazy"></div></div></div>
+        <div class="meta"><div><h3>Unknown IITians</h3><div class="cat">EdTech platform</div></div><a href="https://www.unknowniitians.com/" target="_blank" rel="noopener">unknowniitians.com ↗</a></div>
+      </article>
+
+      <article class="proj w-4" data-reveal style="transition-delay:.1s">
+        <div class="stage"><div class="phone"><div class="shot"><img src="assets/work/divasya.jpg" alt="Divasya mobile app" loading="lazy"></div></div></div>
+        <div class="meta"><div><h3>Divasya</h3><div class="cat">Spiritual tech</div></div><a href="https://divasya-seven.vercel.app/" target="_blank" rel="noopener">divasya-seven.vercel.app ↗</a></div>
+      </article>
+
+      <article class="proj w-4" data-reveal>
+        <div class="stage"><div class="phone"><div class="shot"><img src="assets/work/paniit.jpg" alt="PAN IIT Andhra Pradesh Summit app" loading="lazy"></div></div></div>
+        <div class="meta"><div><h3>PAN IIT App</h3><div class="cat">Summit app, Andhra Pradesh</div></div><a href="https://andhra.paniit.space/" target="_blank" rel="noopener">andhra.paniit.space ↗</a></div>
+      </article>
+
+      <article class="proj w-8" data-reveal style="transition-delay:.1s">
+        <div class="stage"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>quizspacee.com</span></div>
+          <div class="shot"><img src="assets/work/quiz.jpg" alt="Quiz Space website" loading="lazy"></div></div></div>
+        <div class="meta"><div><h3>Quiz Space</h3><div class="cat">Exam practice platform</div></div><a href="https://quizspacee.com/" target="_blank" rel="noopener">quizspacee.com ↗</a></div>
+      </article>
+
+      <article class="proj w-6" data-reveal>
+        <div class="stage"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>ssp.unknowniitians.com</span></div>
+          <div class="shot"><img src="assets/work/erp.jpg" alt="Student Service Portal ERP" loading="lazy"></div></div></div>
+        <div class="meta"><div><h3>Student Service Portal</h3><div class="cat">ERP system</div></div><a href="https://ssp.unknowniitians.com/" target="_blank" rel="noopener">ssp.unknowniitians.com ↗</a></div>
+      </article>
+
+      <article class="proj w-6" data-reveal style="transition-delay:.1s">
+        <div class="stage"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>dmrv-iota.vercel.app</span></div>
+          <div class="shot"><img src="assets/work/acres.jpg" alt="ACRES digital MRV platform" loading="lazy"></div></div></div>
+        <div class="meta"><div><h3>ACRES dMRV</h3><div class="cat">Climate tech, carbon credit tracking</div></div><a href="https://dmrv-iota.vercel.app/" target="_blank" rel="noopener">dmrv-iota.vercel.app ↗</a></div>
+      </article>
+
+      <article class="proj w-4" data-reveal>
+        <div class="stage dark"><span class="dark-grid"></span><span class="dark-dot"></span><div class="dark-in"><span class="tag">AI operating system</span><span class="big">Houdini</span></div></div>
+        <div class="meta"><div><h3>Houdini</h3><div class="cat">AI operating system</div></div></div>
+      </article>
+
+      <article class="proj w-4" data-reveal style="transition-delay:.1s">
+        <div class="stage dark"><span class="dark-grid"></span><span class="dark-dot"></span><div class="dark-in"><span class="tag">Enterprise AI · a Neural AI product</span><span class="big">Brain</span></div></div>
+        <div class="meta"><div><h3>Brain</h3><div class="cat">Enterprise AI, by Neural AI</div></div><a href="https://neuralai.in/" target="_blank" rel="noopener">neuralai.in ↗</a></div>
+      </article>
+
+      <article class="proj w-4" data-reveal style="transition-delay:.2s">
+        <div class="stage dark"><span class="dark-grid"></span><span class="dark-dot"></span><div class="dark-in"><span class="tag">Enterprise EdTech</span><span class="big sm">Wadhwani<br>Foundation</span></div></div>
+        <div class="meta"><div><h3>Enterprise EdTech</h3><div class="cat">Built for Wadhwani Foundation</div></div></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROCESS: scroll assembles the system, hover lifts the blocks ================= -->
+<section class="build" id="process">
+  <div class="build-sticky">
+    <div class="build-copy">
+      <h2>How it <span class="serif">works.</span></h2>
+      <ol class="phases" id="phases">
+        <span class="bar" id="phaseBar"></span>
+        <li class="phase" data-at="0"><div class="row"><span class="mono">01</span><h4>Understand</h4></div><p>We learn your problem and the people it affects.</p></li>
+        <li class="phase" data-at=".2"><div class="row"><span class="mono">02</span><h4>Design</h4></div><p>We plan the product and pick the right AI for it.</p></li>
+        <li class="phase" data-at=".4"><div class="row"><span class="mono">03</span><h4>Build</h4></div><p>We write the software and test it on real data.</p></li>
+        <li class="phase" data-at=".6"><div class="row"><span class="mono">04</span><h4>Launch</h4></div><p>It goes live with your users.</p></li>
+        <li class="phase" data-at=".8"><div class="row"><span class="mono">05</span><h4>Grow</h4></div><p>We keep improving it as more people use it.</p></li>
+      </ol>
+    </div>
+    <canvas id="buildCanvas" aria-hidden="true"></canvas>
+  </div>
+</section>
+
+<!-- ================= NUMBERS ================= -->
+<section class="stats">
+  <div class="wrap stats-row">
+    <div class="stat" data-reveal><b data-count="4">0</b><span>State governments</span></div>
+    <div class="stat" data-reveal style="transition-delay:.1s"><b data-count="9">0</b><span>Clients and partners</span></div>
+    <div class="stat" data-reveal style="transition-delay:.2s"><b data-count="9">0</b><span>Products built</span></div>
+  </div>
+</section>
+
+<!-- ================= FOOTPRINT MAP ================= -->
+<section class="sec" id="footprint">
+  <div class="wrap footprint">
+    <div class="footprint-copy" data-reveal>
+      <h2>Already live<br><span class="serif">across India.</span></h2>
+    </div>
+    <div class="map-box" id="mapBox">
+      <svg class="map" id="map" viewBox="0 0 600 640" aria-label="Map of India with project locations"></svg>
+      <svg class="links" id="links"></svg>
+
+      <div class="stamp-wrap" data-pin="gj" style="left:-4%; top:30%; --r:-8deg; --fx:-40px">
+        <div class="stamp"><div class="stamp-in a">
+          <div><strong>Gujarat</strong></div>
+          <svg class="glyph" viewBox="0 0 100 80" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 78V40l40-30 40 30v38M30 78V52h40v26M50 10v-8M40 52v26M60 52v26"/></svg>
+          <small>Govt. of Gujarat</small>
+        </div></div>
+      </div>
+
+      <div class="stamp-wrap" data-pin="mh" style="left:2%; top:62%; --r:6deg; --fx:-40px">
+        <div class="stamp"><div class="stamp-in c">
+          <div><strong>Mumbai</strong></div>
+          <svg class="glyph" viewBox="0 0 100 80" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 78V36h72v42M24 36c0-14 12-24 26-24s26 10 26 24M50 12V2M36 78V54a14 14 0 0 1 28 0v24"/></svg>
+          <small>Govt. of Maharashtra</small>
+        </div></div>
+      </div>
+
+      <div class="stamp-wrap" data-pin="ap" style="right:-4%; top:44%; --r:7deg; --fx:40px">
+        <div class="stamp"><div class="stamp-in d">
+          <div><strong>Andhra Pradesh</strong></div>
+          <svg class="glyph" viewBox="0 0 100 80" fill="none" stroke="currentColor" stroke-width="2"><path d="M50 4l10 18H40zM38 22h24v12H38zM34 34h32v14H34zM28 48h44v30H28zM44 78V62h12v16"/></svg>
+          <small>Govt. of Andhra Pradesh</small>
+        </div></div>
+      </div>
+
+      <div class="stamp-wrap" data-pin="as" style="right:-3%; top:-10%; --r:6deg; --fx:40px">
+        <div class="stamp"><div class="stamp-in a">
+          <div><strong>Assam</strong></div>
+          <svg class="glyph" viewBox="0 0 100 80" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 78V50h76v28M22 50c0-12 12-20 28-34 16 14 28 22 28 34M50 16V4M34 78V62h12v16M54 78V62h12v16"/></svg>
+          <small>Govt. of Assam</small>
+        </div></div>
+      </div>
+
+      <div class="stamp-wrap" data-pin="tn" style="right:2%; top:74%; --r:-5deg; --fx:40px">
+        <div class="stamp"><div class="stamp-in b">
+          <div><strong>Chennai</strong></div>
+          <svg class="glyph" viewBox="0 0 100 80" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 78V44h84v34M20 44V30h60v14M44 30V12h12v18M50 12V2M30 78V58h10v20M60 78V58h10v20"/></svg>
+          <small>IIT Madras · Research Park</small>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CLIENTS ================= -->
+<section class="sec clients" id="clients" style="padding-top:120px">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <div>
+        <h2>Who we <span class="serif">work with.</span></h2>
+      </div>
+    </div>
+    <div class="client-grid" data-reveal>
+      <!-- Logo files live in assets/logos/. A tile without a file falls back to its wordmark. -->
+      <div class="client"><img class="logo-img" src="assets/logos/iitm.svg" alt="IIT Madras"><span class="name">IIT Madras</span></div>
+      <div class="client"><img class="logo-img" src="assets/logos/iitm-research-park.png" alt="IIT Madras Research Park"><span class="name">IIT Madras Research Park</span></div>
+      <div class="client"><img class="logo-img" src="assets/logos/pan-iit.jpg" alt="PAN IIT Alumni India"><span class="name">PAN IIT Alumni India</span></div>
+      <div class="client"><img class="logo-img" src="assets/logos/acres.svg" alt="ACRES"><span class="name">ACRES</span></div>
+      <div class="client"><img class="logo-img" src="assets/logos/gujarat.svg" alt="Government of Gujarat"><span class="name">Govt. of Gujarat</span></div>
+      <div class="client"><img class="logo-img" src="assets/logos/maharashtra.svg" alt="Government of Maharashtra"><span class="name">Govt. of Maharashtra</span></div>
+      <div class="client"><img class="logo-img" src="assets/logos/andhra.svg" alt="Government of Andhra Pradesh"><span class="name">Govt. of Andhra Pradesh</span></div>
+      <div class="client"><img class="logo-img" src="assets/logos/assam.svg" alt="Government of Assam"><span class="name">Govt. of Assam</span></div>
+      <div class="client"><img class="logo-img" src="assets/logos/divasya.png" alt="Divasya"><span class="name">Divasya</span></div>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section class="sec faq" id="faq">
+  <div class="wrap faq-grid">
+    <h2 data-reveal>Questions<span class="dot">.</span></h2>
+    <div class="faq-list" data-reveal>
+      <details open><summary>What does Neural Engineering do?</summary><p>We build AI software for organisations. You tell us the problem. We design the product, write the code, launch it and keep it running.</p></details>
+      <details><summary>Who is it for?</summary><p>Companies, institutions and governments that want a real AI product in the hands of users, not a demo that never ships.</p></details>
+      <details><summary>Do I need my own AI team?</summary><p>No. We are the team. You bring the problem and someone who can make decisions.</p></details>
+      <details><summary>What have you built?</summary><p>Houdini, an AI operating system. Brain, enterprise AI from Neural AI. Divasya, a spiritual tech app. The Unknown IITians EdTech platform, Quiz Space and a student ERP. The PAN IIT summit app, ACRES dMRV for carbon credits, and enterprise EdTech for Wadhwani Foundation.</p></details>
+      <details><summary>How do we start?</summary><p>Email <a href="mailto:office@neuralai.in">office@neuralai.in</a>. We'll get on a call, understand the problem and come back with a plan.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CLOSING: "Build what's" + a playable word built from blocks ================= -->
+<section class="cta" id="contact">
+  <canvas id="arena" tabindex="-1" aria-label="Playable block game: the word next, built from blocks"></canvas>
+  <div class="cta-copy wrap">
+    <h2>Build what's</h2>
+    <div class="cta-actions">
+      <a href="mailto:office@neuralai.in" class="btn">Start a conversation <span class="arr">→</span></a>
+      <a href="mailto:office@neuralai.in" class="cta-mail">office@neuralai.in</a>
+    </div>
+    <p class="cta-score" id="ctaScore"></p>
+  </div>
+  <div class="cta-hint" id="ctaHint">A D move · W or Space fly · Click shoot · Esc exit</div>
+  <div class="cta-takeover" id="ctaTakeover">Press A, D or W to take control</div>
+</section>
+
+<footer class="mono">
+  <span>© 2026 Neural Engineering</span>
+  <a href="mailto:office@neuralai.in">office@neuralai.in</a>
+</footer>
+
+<script>
+(() => {
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- cursor ---------- */
+  const cursor = document.getElementById("cursor");
+  let cx = innerWidth / 2, cy = innerHeight / 2, tx = cx, ty = cy;
+  addEventListener("pointermove", e => { tx = e.clientX; ty = e.clientY; });
+  (function follow() {
+    cx += (tx - cx) * .2; cy += (ty - cy) * .2;
+    cursor.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
+    requestAnimationFrame(follow);
+  })();
+  document.querySelectorAll("a, .proj, .client, .stamp-wrap").forEach(el => {
+    el.addEventListener("pointerenter", () => cursor.classList.add("big"));
+    el.addEventListener("pointerleave", () => cursor.classList.remove("big"));
+  });
+
+  /* ---------- nav ---------- */
+  const nav = document.getElementById("nav");
+  addEventListener("scroll", () => nav.classList.toggle("scrolled", scrollY > 40), { passive: true });
+
+  /* ---------- reveal ---------- */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
+  }, { threshold: .2 });
+  document.querySelectorAll("[data-reveal], #mapBox").forEach(el => io.observe(el));
+
+  /* ---------- pixel field (hero + CTA) ---------- */
+  const palette = ["#c93a0c", "#ff5a1f", "#ff8a5c", "#ffc2a8", "#ffe9df"];
+  function pixelField(canvas, opts) {
+    const ctx = canvas.getContext("2d");
+    let w, h, cell, cols, rows, mouse = { x: -999, y: -999 };
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    function size() {
+      w = canvas.clientWidth; h = canvas.clientHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cell = w < 700 ? 12 : 16; cols = Math.ceil(w / cell); rows = Math.ceil(h / cell);
+    }
+    size(); addEventListener("resize", size);
+    canvas.parentElement.addEventListener("pointermove", e => {
+      const r = canvas.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;
+    });
+    canvas.parentElement.addEventListener("pointerleave", () => { mouse.x = mouse.y = -999; });
+    // ordered dither matrix gives the crunchy, Mistral-style pixel gradient
+    const bayer = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => v / 16);
+    let visible = true;
+    new IntersectionObserver(([e]) => visible = e.isIntersecting).observe(canvas);
+    const start = performance.now();
+    function frame(now) {
+      requestAnimationFrame(frame);
+      if (!visible) return;
+      const t = reduce ? 0 : (now - start) / 1000;
+      const intro = Math.min(1, (now - start) / 1600);
+      ctx.clearRect(0, 0, w, h);
+      for (let y = 0; y < rows; y++) {
+        const ny = y / rows;
+        for (let x = 0; x < cols; x++) {
+          const nx = x / cols;
+          const wave = Math.sin(nx * 6 + t * .7) * .05 + Math.sin(nx * 13 - t * 1.1) * .025 + Math.sin(nx * 2.3 + t * .3) * .06;
+          let v = opts.shape(nx, ny, wave, intro);
+          const dx = x * cell + cell / 2 - mouse.x, dy = y * cell + cell / 2 - mouse.y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d < 140) v -= (1 - d / 140) * .9;
+          if (v <= 0) continue;
+          const level = v * (palette.length) + bayer[(y % 4) * 4 + (x % 4)] - .5;
+          const idx = Math.floor(level);
+          if (idx < 0) continue;
+          ctx.fillStyle = palette[palette.length - 1 - Math.min(palette.length - 1, idx)];
+          ctx.fillRect(x * cell, y * cell, cell - 1, cell - 1);
+        }
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  // hero: a dithered "sunrise" rising from the bottom
+  pixelField(document.getElementById("pixels"), {
+    shape: (nx, ny, wave, intro) => {
+      const horizon = 1 - .34 * intro;
+      return (ny - horizon - wave) * 3.2;
+    }
+  });
+  /* ---------- build: 27 blocks assemble with scroll, lift on hover ---------- */
+  (() => {
+    const section = document.getElementById("process");
+    const canvas = document.getElementById("buildCanvas");
+    const ctx = canvas.getContext("2d");
+    const phases = [...document.querySelectorAll(".phase")];
+    const bar = document.getElementById("phaseBar");
+    
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    let w, h, unit, progress = 0, shown = 0;
+    const mouse = { x: -9999, y: -9999 };
+    const smooth = (a, b, v) => { const t = Math.min(1, Math.max(0, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
+
+    const N = 3, blocks = [];
+    let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    for (let x = 0; x < N; x++) for (let y = 0; y < N; y++) for (let z = 0; z < N; z++) {
+      blocks.push({ x, y, z, ex: (rnd() - .5) * 14, ey: (rnd() - .5) * 14, ez: (rnd() - .2) * 9, lift: 0, phase: rnd() * 6.28 });
+    }
+
+    function size() {
+      w = canvas.clientWidth; h = canvas.clientHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      unit = Math.min(w, h) / 9;
+    }
+    size(); addEventListener("resize", size);
+    canvas.addEventListener("pointermove", e => { const r = canvas.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; });
+    canvas.addEventListener("pointerleave", () => { mouse.x = mouse.y = -9999; });
+
+    const C = Math.cos(Math.PI / 6), S = Math.sin(Math.PI / 6);
+    const iso = (x, y, z, ox, oy, u) => [ox + (x - y) * C * u, oy + (x + y) * S * u - z * u];
+
+    function face(pts, fill, stroke, alpha) {
+      ctx.beginPath(); pts.forEach(([a, b], i) => i ? ctx.lineTo(a, b) : ctx.moveTo(a, b)); ctx.closePath();
+      if (fill) { ctx.globalAlpha = alpha.fill; ctx.fillStyle = fill; ctx.fill(); }
+      if (alpha.stroke > 0) { ctx.globalAlpha = alpha.stroke; ctx.strokeStyle = stroke; ctx.lineWidth = 1.2; ctx.stroke(); }
+      ctx.globalAlpha = 1;
+    }
+    function chrome(x0, y0, x1, y1, stops) {
+      const g = ctx.createLinearGradient(x0, y0, x1, y1);
+      stops.forEach(([o, c]) => g.addColorStop(o, c)); return g;
+    }
+
+    function drawCube(px, py, pz, ox, oy, u, st) {
+      const P = (a, b, c) => iso(px + a, py + b, pz + c, ox, oy, u);
+      const top = [P(0,0,1), P(1,0,1), P(1,1,1), P(0,1,1)];
+      const right = [P(1,0,1), P(1,1,1), P(1,1,0), P(1,0,0)];
+      const left = [P(0,1,1), P(1,1,1), P(1,1,0), P(0,1,0)];
+      const a = { fill: st.fill, stroke: st.stroke };
+      // flat greys while engineering, blended into brushed-silver gradients once shipped
+      const mix = (flat, sheen) => st.chrome > 0 ? sheen : flat;
+      const [tx, ty] = top[0], [bx, by] = top[2];
+      face(top, mix("#f2f2f0", chrome(tx, ty, bx, by, [[0, "#ffffff"], [.5, "#d4d5d8"], [1, "#f4f4f5"]])), "#0b0b0b", a);
+      face(right, mix("#9a9b9e", chrome(right[0][0], right[0][1], right[2][0], right[2][1], [[0, "#8c8f94"], [.45, "#e9eaec"], [1, "#55575b"]])), "#0b0b0b", a);
+      face(left, mix("#c9cacc", chrome(left[0][0], left[0][1], left[2][0], left[2][1], [[0, "#b9bbbe"], [.6, "#6d6f73"], [1, "#2b2b2b"]])), "#0b0b0b", a);
+    }
+
+    let visible = false;
+    new IntersectionObserver(([e]) => visible = e.isIntersecting).observe(section);
+
+    function frame(now) {
+      requestAnimationFrame(frame);
+      if (!visible) return;
+      const r = section.getBoundingClientRect();
+      progress = Math.min(1, Math.max(0, -r.top / (r.height - innerHeight)));
+      shown += (progress - shown) * .12;
+      const p = reduce ? progress : shown;
+      const t = now / 1000;
+
+      const assemble = smooth(.02, .36, p);
+      const wire = smooth(.12, .3, p);
+      const fill = smooth(.38, .55, p);
+      const chromeAmt = smooth(.6, .72, p);
+      const scale = smooth(.8, .98, p);
+
+      ctx.clearRect(0, 0, w, h);
+      const u = unit * (1 - scale * .55);
+      const ox = w / 2, oy = h / 2 - u * .2;
+
+      // Scale phase: ghost replicas tile out from the core; back ones before the core, front ones after
+      const ring = [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]];
+      const ghosts = front => {
+        if (!scale) return;
+        ring.forEach(([gx, gy], i) => {
+          if ((gx + gy > 0) !== front) return;
+          const k = smooth(i / 10, i / 10 + .4, scale);
+          if (!k) return;
+          const st = { fill: .9 * k, stroke: .5 * k, chrome: 0 };
+          // each ghost is a 3-block column so it reads as a full unit at small size
+          for (let z = 0; z < N; z++) drawCube(gx * 4.2 - .5, gy * 4.2 - .5, z - 1.5, ox, oy, u, st);
+        });
+      };
+      ghosts(false);
+
+      const cx = N / 2;
+      const items = blocks.map(b => {
+        const bob = Math.sin(t * 1.4 + b.phase) * .08 * (1 - assemble);
+        const bx = b.x - cx + b.ex * (1 - assemble);
+        const by = b.y - cx + b.ey * (1 - assemble);
+        const bz0 = b.z - cx + b.ez * (1 - assemble) + bob;
+        const [sx, sy] = iso(bx + .5, by + .5, bz0 + .5, ox, oy, u);
+        const d = Math.hypot(sx - mouse.x, sy - mouse.y);
+        const target = d < u * 2.2 ? (1 - d / (u * 2.2)) * 1.1 : 0;
+        b.lift += (target - b.lift) * .12;
+        return { b, bx, by, bz: bz0 + b.lift, sx, sy };
+      }).sort((m, n) => (m.bx + m.by + m.bz) - (n.bx + n.by + n.bz));
+
+      items.forEach(({ bx, by, bz, sx, sy }) => {
+        // Decode: blocks are just scattered data points
+        if (wire < 1) {
+          ctx.globalAlpha = 1 - wire;
+          ctx.fillStyle = "#0b0b0b";
+          ctx.beginPath(); ctx.arc(sx, sy, 3, 0, Math.PI * 2); ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+        if (wire > 0) drawCube(bx, by, bz, ox, oy, u, { fill, stroke: wire * (1 - chromeAmt * .4), chrome: chromeAmt });
+      });
+      ghosts(true);
+
+      // Architect: dashed links between neighbouring points while the frame forms
+      if (wire > 0 && fill < 1) {
+        ctx.setLineDash([3, 4]); ctx.strokeStyle = "#0b0b0b"; ctx.globalAlpha = .35 * (1 - fill) * (1 - assemble * .5);
+        ctx.beginPath();
+        items.forEach((m, i) => { const n = items[(i * 7 + 3) % items.length]; ctx.moveTo(m.sx, m.sy); ctx.lineTo(n.sx, n.sy); });
+        ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+      }
+
+      // Ship: a light sweep across the polished block
+      if (chromeAmt > 0 && scale < 1) {
+        const sweep = ((t * .35) % 1.6) - .3;
+        const gx = ox - unit * 3 + sweep * unit * 6;
+        const g = ctx.createLinearGradient(gx - 40, 0, gx + 40, 0);
+        g.addColorStop(0, "rgba(255,255,255,0)"); g.addColorStop(.5, `rgba(255,255,255,${.55 * chromeAmt * (1 - scale)})`); g.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.globalCompositeOperation = "source-atop"; ctx.fillStyle = g; ctx.fillRect(0, 0, w, h); ctx.globalCompositeOperation = "source-over";
+      }
+
+      const idx = Math.min(4, Math.floor(progress * 5 + .0001));
+      phases.forEach((ph, i) => ph.classList.toggle("on", i === idx));
+      bar.style.height = (progress * 100) + "%";
+    }
+    requestAnimationFrame(frame);
+
+    // clicking a phase scrolls the build to that point
+    phases.forEach(ph => ph.addEventListener("click", () => {
+      const top = section.offsetTop + (+ph.dataset.at + .1) * (section.offsetHeight - innerHeight);
+      scrollTo({ top, behavior: "smooth" });
+    }));
+  })();
+
+  /* ---------- India map ---------- */
+  // Simplified outline as [lon, lat]; projected into the 600x640 viewBox.
+  const outline = [
+    [68.2,23.7],[68.8,24.3],[70.0,24.6],[71.0,24.4],[70.6,25.7],[70.0,26.6],[70.8,27.7],[72.0,28.4],[73.4,29.9],[74.5,31.0],
+    [74.6,32.0],[74.0,33.0],[74.3,34.6],[75.5,35.8],[77.2,35.6],[78.8,34.5],[78.4,32.6],[79.2,31.3],[80.3,30.3],[81.1,30.0],
+    [82.3,28.0],[84.0,27.4],[85.6,26.6],[88.0,26.4],[88.2,27.9],[88.9,27.3],[89.8,26.7],[91.5,26.8],[92.0,27.5],[94.2,29.2],
+    [96.0,29.4],[97.3,28.2],[96.2,27.2],[95.2,26.6],[94.6,25.2],[94.2,23.8],[93.3,23.0],[93.1,22.0],[92.3,22.0],[91.8,23.2],
+    [91.4,24.0],[92.2,24.6],[92.0,25.2],[90.0,25.2],[89.8,25.9],[88.9,26.2],[88.5,25.6],[88.0,24.5],[88.8,24.0],[88.7,23.2],
+    [89.0,22.0],[88.0,21.6],[87.0,21.5],[86.5,20.2],[85.0,19.3],[84.2,18.3],[82.3,16.8],[81.2,16.0],[80.2,15.3],[80.2,13.5],
+    [79.8,11.5],[79.3,10.3],[78.9,9.3],[77.5,8.1],[76.5,9.5],[75.8,11.2],[74.8,12.9],[74.1,14.8],[73.4,16.5],[72.8,19.0],
+    [72.8,20.8],[72.6,21.5],[72.2,22.2],[71.0,20.8],[69.0,22.3],[70.0,22.9],[68.6,23.3]
+  ];
+  const pins = { gj: [72.6, 23.2], mh: [72.9, 19.1], ap: [80.5, 16.5], tn: [80.23, 12.99], as: [91.77, 26.14] };
+  const k = 19, ox = 60, oy = 20;
+  const proj = ([lon, lat]) => [ox + (lon - 68) * k, oy + (36.2 - lat) * k * 1.05];
+  const svgNS = "http://www.w3.org/2000/svg";
+  const map = document.getElementById("map");
+  const d = outline.map((pt, i) => (i ? "L" : "M") + proj(pt).map(n => n.toFixed(1)).join(" ")).join("") + "Z";
+  map.innerHTML = `
+    <defs>
+      <pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.4" fill="rgba(255,255,255,.28)"/></pattern>
+    </defs>
+    <path class="india" d="${d}"/>
+    <path d="${d}" fill="url(#dots)" class="india-dots" opacity="0"/>
+    <path class="india-ink" d="${d}"/>`;
+  const len = map.querySelector(".india").getTotalLength();
+  map.querySelectorAll(".india, .india-ink").forEach(p => p.style.setProperty("--len", len));
+  const dots = map.querySelector(".india-dots");
+  dots.style.transition = "opacity 1s 1.4s";
+  Object.entries(pins).forEach(([id, ll], i) => {
+    const [x, y] = proj(ll);
+    const g = document.createElementNS(svgNS, "g");
+    g.setAttribute("class", "pin"); g.dataset.id = id;
+    g.style.transitionDelay = (1.2 + i * .15) + "s";
+    g.innerHTML = `<circle class="ring" cx="${x}" cy="${y}" r="10"/><circle cx="${x}" cy="${y}" r="9" fill="#0b0b0b" stroke="#fff" stroke-width="4"/>`;
+    map.appendChild(g);
+  });
+  const mapBox = document.getElementById("mapBox");
+  new MutationObserver(() => { if (mapBox.classList.contains("in")) dots.setAttribute("opacity", "1"); })
+    .observe(mapBox, { attributes: true, attributeFilter: ["class"] });
+
+  // dashed leader lines from each pin to its stamp
+  const links = document.getElementById("links");
+  function drawLinks() {
+    const box = mapBox.getBoundingClientRect();
+    links.innerHTML = "";
+    document.querySelectorAll(".stamp-wrap").forEach(st => {
+      // map pin coords through the SVG's CTM and stamps via offset*, so neither mid-animation transform skews the line
+      const pt = map.createSVGPoint();
+      [pt.x, pt.y] = proj(pins[st.dataset.pin]);
+      const scr = pt.matrixTransform(map.getScreenCTM());
+      const sx = st.offsetLeft + st.offsetWidth / 2, sy = st.offsetTop + st.offsetHeight / 2;
+      const px = scr.x - box.left, py = scr.y - box.top;
+      const line = document.createElementNS(svgNS, "line");
+      line.setAttribute("x1", px); line.setAttribute("y1", py);
+      line.setAttribute("x2", sx); line.setAttribute("y2", sy);
+      links.appendChild(line);
+    });
+  }
+  drawLinks(); addEventListener("resize", drawLinks);
+
+  // links render under the stamps
+  mapBox.insertBefore(links, mapBox.querySelector(".stamp-wrap"));
+
+  /* ---------- closing arena: "next." is a level made of blocks ---------- */
+  (() => {
+    const sec = document.getElementById("contact");
+    const canvas = document.getElementById("arena");
+    const ctx = canvas.getContext("2d");
+    const scoreEl = document.getElementById("ctaScore");
+    const hint = document.getElementById("ctaHint");
+    const takeoverEl = document.getElementById("ctaTakeover");
+    const cursorEl = document.getElementById("cursor");
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const ORANGE = "#ff5a1f", INK = "#0e0e10", GROUND = ["#c93a0c", "#ff5a1f", "#ff8a5c"];
+    const FONT = '"Host Grotesk", "Helvetica Neue", Arial, sans-serif';
+    const WORD = "next.";
+    const bayer = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+    const isTouch = matchMedia("(hover: none)").matches;
+    if (isTouch) {
+      hint.textContent = "Tap left or right to move · centre to fly · auto fire";
+      takeoverEl.textContent = "Tap to take control";
+    }
+
+    let W, H, T, cols, rows, grid = [], assembling = false;
+
+    function layout() {
+      W = canvas.clientWidth; H = canvas.clientHeight;
+      canvas.width = W * dpr; canvas.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      T = Math.max(12, Math.round(Math.min(W / 64, H / 36)));
+      cols = Math.ceil(W / T); rows = Math.floor(H / T);
+      grid = new Array(cols * rows).fill(null);
+      const groundTop = rows - 2;
+      sec.style.setProperty("--ground", (H - groundTop * T) + "px");
+      for (let r = groundTop; r < rows; r++) for (let c = 0; c < cols; c++) {
+        const d = bayer[(r % 4) * 4 + (c % 4)] > 7 ? 1 : 0;
+        grid[r * cols + c] = { kind: "ground", alive: true, t: 1, color: GROUND[(r === groundTop ? 1 : 0) + d] };
+      }
+      // rasterise the word at one pixel per tile; every filled pixel becomes a block
+      const off = document.createElement("canvas"); off.width = cols; off.height = rows;
+      const o = off.getContext("2d", { willReadFrequently: true });
+      o.font = `700 100px ${FONT}`;
+      const m = o.measureText(WORD);
+      const size = Math.floor(100 * Math.min(cols * .9 / m.width, rows * .44 / m.actualBoundingBoxAscent));
+      o.font = `700 ${size}px ${FONT}`;
+      const x0 = Math.round((cols - o.measureText(WORD).width) / 2);
+      const dotX = x0 + o.measureText("next").width;
+      o.fillText(WORD, x0, groundTop);
+      const px = o.getImageData(0, 0, cols, rows).data;
+      for (let r = 0; r < groundTop; r++) for (let c = 0; c < cols; c++) {
+        if (px[(r * cols + c) * 4 + 3] > 120) {
+          grid[r * cols + c] = { kind: "word", alive: true, hp: 3, t: 0, delay: c * .018 + Math.random() * .35, flash: 0, respawn: 0, total: 1, dot: c >= dotX };
+        }
+      }
+    }
+
+    const keys = new Set(), mouse = { x: 0, y: 0, down: false };
+    // "auto": the section plays itself; "play": the visitor has taken control
+    let state = "auto", clock = 0, player, bullets = [], enemies = [], parts = [], score = 0, best = 0, spawnT = 0, shootT = 0, shake = 0, touch = null;
+
+    function spawnPlayer() {
+      const k = T / 24;
+      player = { x: W * .5, y: T * 2, vx: 0, vy: 0, w: 16 * k, h: 28 * k, hp: 100, fuel: 1, ground: false, face: 1, hurt: 0, aim: 0 };
+    }
+
+    const solid = (c, r) => {
+      if (c < 0 || c >= cols || r < 0) return false;
+      if (r >= rows) return true;
+      const g = grid[r * cols + c];
+      return !!(g && g.alive && g.t > .6);
+    };
+    // range of solid tiles overlapping a box: [minC, maxC, minR, maxR] or null
+    function hits(b) {
+      let out = null;
+      const c0 = Math.floor(b.x / T), c1 = Math.floor((b.x + b.w - .01) / T);
+      const r0 = Math.floor(b.y / T), r1 = Math.floor((b.y + b.h - .01) / T);
+      for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) if (solid(c, r)) {
+        if (!out) out = [c, c, r, r];
+        else { out[0] = Math.min(out[0], c); out[1] = Math.max(out[1], c); out[2] = Math.min(out[2], r); out[3] = Math.max(out[3], r); }
+      }
+      return out;
+    }
+    const burst = (x, y, n, color, speed = 260) => {
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, v = speed * (.3 + Math.random());
+        parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 80, life: .5 + Math.random() * .5, s: (3 + Math.random() * 4) * T / 24, c: color });
+      }
+    };
+
+    function update(dt) {
+      const live = state === "play", p = player, k = T / 24;
+
+      grid.forEach((g, i) => {
+        if (!g || g.kind !== "word") return;
+        if (!g.alive) {
+          g.respawn -= dt;
+          const c = i % cols, r = (i / cols) | 0;
+          const blocked = p.x < (c + 1) * T && p.x + p.w > c * T && p.y < (r + 1) * T && p.y + p.h > r * T;
+          if (g.respawn <= 0 && !blocked) { g.alive = true; g.t = 0; g.delay = 0; g.hp = 3; }
+          return;
+        }
+        if (g.t < 1 && assembling) { if (g.delay > 0) g.delay -= dt; else g.t = Math.min(1, g.t + dt * 2.4); }
+        g.flash = Math.max(0, g.flash - dt);
+      });
+
+      clock += dt;
+      let left = live && (keys.has("a") || keys.has("arrowleft") || touch === "left");
+      let right = live && (keys.has("d") || keys.has("arrowright") || touch === "right");
+      let jet = live && (keys.has("w") || keys.has("arrowup") || keys.has(" ") || touch === "jet");
+      let botTarget = null;
+      if (!live && assembling) {
+        // autopilot: keep a few blocks of distance from the nearest drone, hover at its height and fire
+        botTarget = enemies.reduce((m, e) => !m || Math.hypot(e.x - p.x, e.y - p.y) < Math.hypot(m.x - p.x, m.y - p.y) ? e : m, null);
+        const tx = botTarget ? botTarget.x + (p.x < botTarget.x ? -T * 7 : T * 7) : W * (.5 + Math.sin(clock * .35) * .35);
+        const ty = botTarget ? botTarget.y + T * 2 : H * (.42 + Math.sin(clock * .9) * .08);
+        left = tx < p.x - T; right = tx > p.x + T;
+        jet = p.y > ty && p.fuel > .12;
+      }
+      p.vx = (right - left) * 270 * k;
+      if (p.vx) p.face = Math.sign(p.vx);
+      if (jet && p.fuel > 0) {
+        p.vy -= 2500 * k * dt; p.fuel = Math.max(0, p.fuel - dt * .5);
+        parts.push({ x: p.x + p.w / 2 - p.face * 8 * k, y: p.y + p.h - 4, vx: (Math.random() - .5) * 60, vy: 220, life: .25, s: 4 * k, c: Math.random() < .5 ? ORANGE : "#ffc2a8" });
+      } else p.fuel = Math.min(1, p.fuel + dt * (p.ground ? .9 : .12));
+      p.vy = Math.max(-440 * k, Math.min(740 * k, p.vy + 1450 * k * dt));
+
+      p.x += p.vx * dt;
+      let h = hits(p);
+      if (h) p.x = p.vx > 0 ? h[0] * T - p.w : (h[1] + 1) * T;
+      p.x = Math.max(0, Math.min(W - p.w, p.x));
+      p.y += p.vy * dt; p.ground = false;
+      h = hits(p);
+      if (h) { if (p.vy > 0) { p.y = h[2] * T - p.h; p.ground = true; } else p.y = (h[3] + 1) * T; p.vy = 0; }
+      if (p.y < 0) { p.y = 0; p.vy = 0; }
+      p.hurt = Math.max(0, p.hurt - dt);
+
+      let ax = mouse.x, ay = mouse.y;
+      if (touch && enemies.length) {
+        const n = enemies.reduce((m, e) => Math.hypot(e.x - p.x, e.y - p.y) < Math.hypot(m.x - p.x, m.y - p.y) ? e : m);
+        ax = n.x; ay = n.y;
+      }
+      if (botTarget) { ax = botTarget.x; ay = botTarget.y; }
+      const wantAim = live || botTarget ? Math.atan2(ay - (p.y + 12 * k), ax - (p.x + p.w / 2)) : (p.face > 0 ? -.25 : Math.PI + .25);
+      // ease the autopilot's aim so it reads like a person tracking, not a snap
+      p.aim = live ? wantAim : p.aim + Math.atan2(Math.sin(wantAim - p.aim), Math.cos(wantAim - p.aim)) * Math.min(1, dt * 8);
+      shootT -= dt;
+      const botFire = botTarget && Math.abs(Math.atan2(Math.sin(wantAim - p.aim), Math.cos(wantAim - p.aim))) < .2;
+      if ((live ? (mouse.down || (touch && enemies.length)) : botFire) && shootT <= 0) {
+        bullets.push({ x: p.x + p.w / 2 + Math.cos(p.aim) * 20 * k, y: p.y + 12 * k + Math.sin(p.aim) * 20 * k, vx: Math.cos(p.aim) * 980, vy: Math.sin(p.aim) * 980 });
+        shootT = live ? .11 : .16;
+      }
+
+      bullets = bullets.filter(b => {
+        b.x += b.vx * dt; b.y += b.vy * dt;
+        if (b.x < 0 || b.x > W || b.y < 0 || b.y > H) return false;
+        const c = Math.floor(b.x / T), r = Math.floor(b.y / T);
+        if (solid(c, r)) {
+          const g = grid[r * cols + c];
+          if (g && g.kind === "word") {
+            g.hp--; g.flash = .07;
+            if (g.hp <= 0) { g.alive = false; g.total = g.respawn = 3 + Math.random() * 2; burst((c + .5) * T, (r + .5) * T, 6, g.dot ? ORANGE : INK, 180); }
+          } else burst(b.x, b.y, 2, ORANGE, 100);
+          return false;
+        }
+        const e = enemies.find(e => Math.abs(e.x - b.x) < 14 * k && Math.abs(e.y - b.y) < 14 * k);
+        if (e) { e.hp--; e.flash = .08; e.vx += b.vx * .05; e.vy += b.vy * .05; return false; }
+        return true;
+      });
+
+      if (assembling) {
+        spawnT -= dt;
+        if (spawnT <= 0 && (live || enemies.length < 3)) {
+          const side = Math.random();
+          enemies.push({ x: side < .5 ? (side < .25 ? -20 : W + 20) : Math.random() * W, y: side < .5 ? Math.random() * H * .4 : -20, vx: 0, vy: 0, hp: 2 + Math.floor(score / 300), flash: 0, ph: Math.random() * 6 });
+          spawnT = live ? Math.max(.4, 1.5 - score / 500) : 1.4 + Math.random();
+        }
+      }
+      const spd = (110 + Math.min(140, score / 6)) * k;
+      enemies = enemies.filter(e => {
+        const dx = p.x + p.w / 2 - e.x, dy = p.y + p.h / 2 - e.y, d = Math.hypot(dx, dy) || 1;
+        e.ph += dt * 4;
+        e.vx += ((dx / d) * spd - e.vx) * dt * 1.6;
+        e.vy += ((dy / d) * spd + Math.sin(e.ph) * 80 - e.vy) * dt * 1.6;
+        e.x += e.vx * dt; e.y += e.vy * dt; e.flash = Math.max(0, e.flash - dt);
+        if (e.hp <= 0) { burst(e.x, e.y, 16, ORANGE); if (live) { score += 10; shake = .15; } return false; }
+        if (d < 22 * k) { burst(e.x, e.y, 12, ORANGE); p.hurt = .3; if (live) { p.hp -= 20; shake = .3; } return false; }
+        return true;
+      });
+
+      parts = parts.filter(q => { q.life -= dt; q.vy += 700 * dt; q.x += q.vx * dt; q.y += q.vy * dt; return q.life > 0; });
+      shake = Math.max(0, shake - dt);
+      if (live && p.hp <= 0) { burst(p.x + p.w / 2, p.y + p.h / 2, 30, INK, 320); end(true); }
+    }
+
+    function drawPlayer(p) {
+      const k = T / 24, cx = p.x + p.w / 2;
+      ctx.save();
+      if (p.hurt > 0 && Math.floor(p.hurt * 30) % 2) ctx.globalAlpha = .4;
+      ctx.translate(p.x, p.y); ctx.scale(k, k);
+      const fx = p.face > 0 ? -1 : 1;
+      ctx.fillStyle = ORANGE; ctx.fillRect(8 + fx * 9 - 4, 9, 8, 13);
+      ctx.fillStyle = INK; ctx.fillRect(2, 8, 12, 14); ctx.fillRect(3, 22, 4, 6); ctx.fillRect(9, 22, 4, 6);
+      ctx.fillStyle = "#e9d2c0"; ctx.fillRect(3, 0, 10, 9);
+      ctx.fillStyle = INK; ctx.fillRect(2, -2, 12, 4);
+      ctx.restore();
+      ctx.save(); ctx.translate(cx, p.y + 12 * k); ctx.rotate(p.aim); ctx.scale(k, k);
+      ctx.fillStyle = "#4a4a4f"; ctx.fillRect(0, -2.5, 22, 5); ctx.fillStyle = INK; ctx.fillRect(4, -1, 6, 7);
+      ctx.restore();
+    }
+
+    function draw() {
+      ctx.save();
+      if (shake) ctx.translate((Math.random() - .5) * shake * 30, (Math.random() - .5) * shake * 30);
+      ctx.fillStyle = "#fff"; ctx.fillRect(-20, -20, W + 40, H + 40);
+      ctx.strokeStyle = "#f4f4f1"; ctx.lineWidth = 1; ctx.beginPath();
+      for (let x = 0; x <= W; x += T) { ctx.moveTo(x + .5, 0); ctx.lineTo(x + .5, H); }
+      for (let y = 0; y <= H; y += T) { ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); }
+      ctx.stroke();
+
+      for (let i = 0; i < grid.length; i++) {
+        const g = grid[i]; if (!g) continue;
+        const c = i % cols, r = (i / cols) | 0, x = c * T, y = r * T;
+        if (g.kind === "ground") { ctx.fillStyle = g.color; ctx.fillRect(x + 1, y + 1, T - 2, T - 2); continue; }
+        if (!g.alive) {
+          // broken block: dashed outline that fills back up as it rebuilds
+          const prog = 1 - Math.max(0, g.respawn) / g.total;
+          ctx.fillStyle = "#ececea"; ctx.fillRect(x + 1, y + 1 + (T - 2) * (1 - prog), T - 2, (T - 2) * prog);
+          ctx.setLineDash([3, 3]); ctx.strokeStyle = "#cfcfca"; ctx.strokeRect(x + 1.5, y + 1.5, T - 3, T - 3); ctx.setLineDash([]);
+          continue;
+        }
+        if (g.t <= 0) continue;
+        const e = 1 - Math.pow(1 - g.t, 3);
+        ctx.globalAlpha = Math.min(1, g.t * 3);
+        ctx.fillStyle = g.flash ? "#ffffff" : g.dot ? ORANGE : INK;
+        ctx.fillRect(x + 1, y + 1 - (1 - e) * (y + T * 4), T - 2, T - 2);
+        ctx.globalAlpha = 1;
+      }
+
+      parts.forEach(q => { ctx.globalAlpha = Math.min(1, q.life * 2); ctx.fillStyle = q.c; ctx.fillRect(q.x, q.y, q.s, q.s); });
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = ORANGE; ctx.lineWidth = 3; ctx.beginPath();
+      bullets.forEach(b => { ctx.moveTo(b.x, b.y); ctx.lineTo(b.x - b.vx * .018, b.y - b.vy * .018); });
+      ctx.stroke();
+
+      const k = T / 24;
+      enemies.forEach(e => {
+        const s = 12 * k;
+        ctx.fillStyle = e.flash ? "#fff" : ORANGE; ctx.strokeStyle = INK; ctx.lineWidth = 2;
+        ctx.fillRect(e.x - s, e.y - s, s * 2, s * 2); ctx.strokeRect(e.x - s, e.y - s, s * 2, s * 2);
+        const a = Math.atan2(player.y - e.y, player.x - e.x);
+        ctx.fillStyle = INK; ctx.fillRect(e.x - 4 * k + Math.cos(a) * 4 * k, e.y - 4 * k + Math.sin(a) * 4 * k, 8 * k, 8 * k);
+        ctx.fillRect(e.x - s - 4 * k, e.y - s - 3 * k, s * 2 + 8 * k, 2);
+      });
+
+      if (assembling && player.hp > 0) drawPlayer(player);
+      ctx.restore();
+
+      if (state === "play") {
+        const bar = (x, y, v, c) => { ctx.fillStyle = "#ececea"; ctx.fillRect(x, y, 140, 6); ctx.fillStyle = c; ctx.fillRect(x, y, 140 * Math.max(0, v), 6); };
+        const top = 96;
+        ctx.font = `600 28px ${FONT}`; ctx.fillStyle = INK; ctx.textAlign = "right";
+        ctx.fillText(String(score).padStart(4, "0"), W - 24, top + 24);
+        bar(W - 164, top + 38, player.hp / 100, INK); bar(W - 164, top + 50, player.fuel, ORANGE);
+        if (!touch && !isTouch) {
+          ctx.strokeStyle = INK; ctx.lineWidth = 1.5; ctx.beginPath();
+          ctx.arc(mouse.x, mouse.y, 9, 0, Math.PI * 2);
+          [[-15, 0, -5, 0], [5, 0, 15, 0], [0, -15, 0, -5], [0, 5, 0, 15]].forEach(([a, b, c, d]) => { ctx.moveTo(mouse.x + a, mouse.y + b); ctx.lineTo(mouse.x + c, mouse.y + d); });
+          ctx.stroke();
+        }
+      }
+    }
+
+    // take over from the autopilot mid-flight: same character, same spot, fresh score
+    function takeOver() {
+      if (state === "play") return;
+      score = 0; spawnT = .8; player.hp = 100; player.fuel = 1;
+      state = "play"; sec.classList.add("playing");
+      scoreEl.textContent = "";
+      canvas.focus({ preventScroll: true });
+    }
+    function end(died) {
+      state = "auto"; sec.classList.remove("playing"); mouse.down = false; keys.clear();
+      best = Math.max(best, score);
+      if (died) scoreEl.textContent = `You scored ${score}. Best ${best}.`;
+      cursorEl.style.opacity = 1;
+      if (died) { player.hp = 0; setTimeout(spawnPlayer, 900); }
+    }
+
+    function init() { layout(); spawnPlayer(); }
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(init);
+    let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { layout(); spawnPlayer(); }, 150); });
+
+    let visible = false, last = performance.now();
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) assembling = true; }, { threshold: .35 }).observe(sec);
+    (function loop(now) {
+      requestAnimationFrame(loop);
+      const dt = Math.min(1 / 30, (now - last) / 1000); last = now;
+      if (!visible || !player) return;
+      update(dt); draw();
+    })(last);
+
+    const pos = e => { const r = canvas.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; };
+    canvas.addEventListener("pointermove", pos);
+    canvas.addEventListener("pointerdown", e => {
+      pos(e);
+      if (!player || player.hp <= 0) return;
+      takeOver();
+      cursorEl.style.opacity = 0;
+      if (e.pointerType === "touch") touch = mouse.x < W / 3 ? "left" : mouse.x > W * 2 / 3 ? "right" : "jet";
+      else mouse.down = true;
+    });
+    addEventListener("pointerup", () => { mouse.down = false; touch = null; });
+    canvas.addEventListener("pointerenter", () => { if (state === "play") cursorEl.style.opacity = 0; });
+    canvas.addEventListener("pointerleave", () => { cursorEl.style.opacity = 1; mouse.down = false; });
+
+    // keys only steer the game while a round runs and the section is on screen, so normal scrolling still works
+    const GAME_KEYS = ["a", "d", "w", " ", "arrowleft", "arrowright", "arrowup"];
+    addEventListener("keydown", e => {
+      const k = e.key.toLowerCase();
+      if (!visible || !player || player.hp <= 0) return;
+      if (state === "play" && k === "escape") return end(false);
+      // Space and arrows keep scrolling the page while on autopilot; only A / D / W take control
+      if (state === "auto" && !["a", "d", "w"].includes(k)) return;
+      takeOver();
+      if (GAME_KEYS.includes(k)) { e.preventDefault(); keys.add(k); }
+    });
+    addEventListener("keyup", e => keys.delete(e.key.toLowerCase()));
+    addEventListener("blur", () => keys.clear());
+  })();
+
+  /* ---------- work: previews scroll through the real page on hover ---------- */
+  document.querySelectorAll(".proj").forEach(proj => {
+    const shot = proj.querySelector(".shot"), img = shot && shot.querySelector("img");
+    if (!img) return;
+    const play = () => {
+      const dist = Math.max(0, img.offsetHeight - shot.clientHeight);
+      img.style.transition = `transform ${Math.max(1.2, dist / 260)}s cubic-bezier(.45,0,.55,1)`;
+      img.style.transform = `translateY(${-dist}px)`;
+    };
+    const back = () => { img.style.transition = "transform 1.1s var(--ease)"; img.style.transform = "translateY(0)"; };
+    proj.addEventListener("pointerenter", e => e.pointerType === "mouse" && play());
+    proj.addEventListener("pointerleave", e => e.pointerType === "mouse" && back());
+    // touch screens have no hover: run one slow pass when the card comes into view
+    if (matchMedia("(hover: none)").matches) {
+      const io = new IntersectionObserver(([en]) => { if (en.isIntersecting) { play(); io.disconnect(); } }, { threshold: .6 });
+      io.observe(proj);
+    }
+  });
+
+  /* ---------- count-up numbers ---------- */
+  const counter = new IntersectionObserver(entries => entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    counter.unobserve(en.target);
+    const el = en.target, to = +el.dataset.count, t0 = performance.now();
+    (function tick(now) {
+      const k = Math.min(1, (now - t0) / 1400);
+      el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) requestAnimationFrame(tick);
+    })(t0);
+  }), { threshold: .6 });
+  document.querySelectorAll("[data-count]").forEach(el => counter.observe(el));
+
+  /* ---------- FAQ: one answer open at a time ---------- */
+  document.querySelectorAll(".faq details").forEach(d => d.addEventListener("toggle", () => {
+    if (d.open) document.querySelectorAll(".faq details").forEach(o => o !== d && (o.open = false));
+  }));
+
+  /* ---------- client logos: missing file -> wordmark ---------- */
+  document.querySelectorAll(".client .logo-img").forEach(img => {
+    const fail = () => img.closest(".client").classList.add("no-logo");
+    if (img.complete && !img.naturalWidth) fail(); else img.addEventListener("error", fail);
+  });
+
+  /* ---------- client tiles: fill follows pointer ---------- */
+  document.querySelectorAll(".client").forEach(c => c.addEventListener("pointerenter", e => {
+    const r = c.getBoundingClientRect();
+    c.style.setProperty("--mx", (e.clientX - r.left) + "px");
+    c.style.setProperty("--my", (e.clientY - r.top) + "px");
+  }));
+})();
+</script>
+</body>
+</html>

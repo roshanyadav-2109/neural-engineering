@@ -177,6 +177,11 @@
   .bar span { margin-left: 10px; flex: 1; max-width: 300px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; font-size: 12px; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .shot { position: relative; overflow: hidden; aspect-ratio: 16 / 10; background: #fff; }
   .shot img { display: block; width: 100%; height: auto; will-change: transform; }
+  /* desktop previews run edge to edge so they line up with the card text */
+  .stage.full { padding: 0; place-items: stretch; background: #fff; border: 1px solid var(--line); }
+  .stage.full .browser { max-width: none; height: 100%; border-radius: 0; box-shadow: none; display: flex; flex-direction: column; transform: none; }
+  .stage.full .shot { flex: 1; aspect-ratio: auto; }
+  .proj:hover .stage.full { background: #fff; border-color: #cfcfca; }
 
   /* phone frame */
   .phone { height: 100%; aspect-ratio: 9 / 19; max-height: 460px; background: var(--ink); border-radius: 38px; padding: 9px; box-shadow: 0 24px 50px -18px rgba(0,0,0,.35); position: relative; transition: transform .7s var(--ease); }
@@ -388,7 +393,7 @@
 
     <div class="work-grid">
       <article class="proj w-8" data-reveal>
-        <div class="stage"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>unknowniitians.com</span></div>
+        <div class="stage full"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>unknowniitians.com</span></div>
           <div class="shot"><img src="assets/work/ui.jpg" alt="Unknown IITians website" loading="lazy"></div></div></div>
         <div class="meta"><div><h3>Unknown IITians</h3><div class="cat">EdTech platform</div></div><a href="https://www.unknowniitians.com/" target="_blank" rel="noopener">unknowniitians.com ↗</a></div>
       </article>
@@ -404,19 +409,19 @@
       </article>
 
       <article class="proj w-8" data-reveal style="transition-delay:.1s">
-        <div class="stage"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>quizspacee.com</span></div>
+        <div class="stage full"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>quizspacee.com</span></div>
           <div class="shot"><img src="assets/work/quiz.jpg" alt="Quiz Space website" loading="lazy"></div></div></div>
         <div class="meta"><div><h3>Quiz Space</h3><div class="cat">Exam practice platform</div></div><a href="https://quizspacee.com/" target="_blank" rel="noopener">quizspacee.com ↗</a></div>
       </article>
 
       <article class="proj w-6" data-reveal>
-        <div class="stage"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>ssp.unknowniitians.com</span></div>
+        <div class="stage full"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>ssp.unknowniitians.com</span></div>
           <div class="shot"><img src="assets/work/erp.jpg" alt="Student Service Portal ERP" loading="lazy"></div></div></div>
         <div class="meta"><div><h3>Student Service Portal</h3><div class="cat">ERP system</div></div><a href="https://ssp.unknowniitians.com/" target="_blank" rel="noopener">ssp.unknowniitians.com ↗</a></div>
       </article>
 
       <article class="proj w-6" data-reveal style="transition-delay:.1s">
-        <div class="stage"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>dmrv-iota.vercel.app</span></div>
+        <div class="stage full"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>dmrv-iota.vercel.app</span></div>
           <div class="shot"><img src="assets/work/acres.jpg" alt="ACRES digital MRV platform" loading="lazy"></div></div></div>
         <div class="meta"><div><h3>ACRES dMRV</h3><div class="cat">Climate tech, carbon credit tracking</div></div><a href="https://dmrv-iota.vercel.app/" target="_blank" rel="noopener">dmrv-iota.vercel.app ↗</a></div>
       </article>

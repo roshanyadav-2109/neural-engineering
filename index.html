@@ -75,7 +75,24 @@
   .btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
   .btn.ghost:hover { color: #fff; }
   .btn.ghost::before { background: var(--ink); }
-  @media (max-width: 760px) { .nav-links { display: none; } }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .menu-btn { display: none; width: 44px; height: 44px; border: 1px solid var(--line); background: #fff; cursor: pointer; flex-direction: column; justify-content: center; align-items: center; gap: 6px; }
+  .menu-btn i { width: 18px; height: 1.5px; background: var(--ink); transition: transform .4s var(--ease); }
+  nav.open .menu-btn i:first-child { transform: translateY(3.75px) rotate(45deg); }
+  nav.open .menu-btn i:last-child { transform: translateY(-3.75px) rotate(-45deg); }
+  @media (max-width: 760px) {
+    nav { padding: 14px 16px; }
+    .nav-links { display: none; }
+    .menu-btn { display: flex; }
+    .nav-right .btn { padding: 12px 16px; font-size: 14px; }
+    .logo-word { font-size: 26px; }
+    .logo-light { font-size: 14px; }
+    nav.open { background: #fff; border-bottom: 1px solid var(--line); }
+    nav.open .nav-links { display: flex; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: #fff; padding: 4px 16px 20px; border-bottom: 1px solid var(--line); gap: 0; }
+    nav.open .nav-links a { padding: 16px 0; font-size: 22px; border-bottom: 1px solid var(--line); }
+    nav.open .nav-links a::after { display: none; }
+    .cursor { display: none; }
+  }
 
   /* ---------- hero ---------- */
   .hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
@@ -147,7 +164,11 @@
   .stat:last-child { border-right: 0; }
   .stat b { font-size: clamp(72px, 9vw, 140px); font-weight: 600; letter-spacing: -.05em; line-height: .9; }
   .stat span { color: var(--mute); font-size: 17px; }
-  @media (max-width: 760px) { .stats-row { grid-template-columns: 1fr; } .stat { border-right: 0; border-bottom: 1px solid var(--line); padding-left: 0; } }
+  @media (max-width: 760px) {
+    .stat { padding: 36px 0 32px 14px; gap: 6px; }
+    .stat b { font-size: 56px; }
+    .stat span { font-size: 13px; line-height: 1.3; }
+  }
 
   /* ---------- FAQ ---------- */
   .faq-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 40px; align-items: start; }
@@ -172,9 +193,9 @@
   /* browser frame */
   .browser { width: 100%; max-width: 760px; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 24px 50px -18px rgba(0,0,0,.28); transform: translateY(0); transition: transform .7s var(--ease), box-shadow .7s var(--ease); }
   .proj:hover .browser, .proj:hover .phone { transform: translateY(-8px); }
-  .bar { display: flex; align-items: center; gap: 6px; padding: 10px 12px; background: #f6f6f4; border-bottom: 1px solid var(--line); }
-  .bar i { width: 9px; height: 9px; border-radius: 50%; background: #dcdcd7; }
-  .bar span { margin-left: 10px; flex: 1; max-width: 300px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; font-size: 12px; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chrome-bar { display: flex; align-items: center; gap: 6px; padding: 10px 12px; background: #f6f6f4; border-bottom: 1px solid var(--line); }
+  .chrome-bar i { width: 9px; height: 9px; border-radius: 50%; background: #dcdcd7; }
+  .chrome-bar span { margin-left: 10px; flex: 1; max-width: 300px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; font-size: 12px; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .shot { position: relative; overflow: hidden; aspect-ratio: 16 / 10; background: #fff; }
   .shot img { display: block; width: 100%; height: auto; will-change: transform; }
 
@@ -201,7 +222,10 @@
   .meta a:hover { color: var(--red); }
   @media (max-width: 960px) {
     .w-8, .w-6, .w-4 { grid-column: span 12; }
-    .stage { height: 420px; padding: 20px; }
+    .stage { height: auto; padding: 20px 16px; }
+    .stage:has(.phone) { height: 480px; padding: 20px; }
+    .stage.dark { height: 260px; }
+    .meta h3 { font-size: 24px; }
   }
 
   /* ---------- build / process ---------- */
@@ -225,7 +249,7 @@
   .build-meta { position: absolute; right: 4vw; bottom: 32px; z-index: 2; display: flex; gap: 24px; color: var(--mute); }
   .build-meta b { color: var(--ink); font-weight: 500; }
   @media (max-width: 860px) {
-    .build-sticky { grid-template-columns: 1fr; grid-template-rows: auto 1fr; padding-top: 80px; gap: 0; }
+    .build-sticky { grid-template-columns: 1fr; grid-template-rows: auto 1fr; padding-top: 100px; gap: 0; }
     .build-copy h2 { margin-bottom: 16px; font-size: 40px; }
     .phase { padding: 6px 0 6px 16px; } .phase p { display: none; }
     #buildCanvas { height: 46svh; }
@@ -236,6 +260,17 @@
   .footprint { display: grid; grid-template-columns: 1fr 1.25fr; gap: 40px; align-items: center; }
   .footprint-copy p { font-size: 18px; color: #444; line-height: 1.45; max-width: 380px; margin-top: 28px; }
   .map-box { position: relative; aspect-ratio: 1 / 1.05; }
+  @media (max-width: 760px) {
+    .map-box { aspect-ratio: auto; display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px 10px; }
+    .map-box svg.map { grid-column: 1 / -1; height: auto; aspect-ratio: 600 / 640; }
+    .map-box svg.links { display: none; }
+    .map-box .stamp-wrap { position: static; width: auto; grid-column: span 2; --fx: 0px !important; }
+    #footprint { overflow-x: clip; }
+    .map-box .stamp-wrap:nth-of-type(4) { grid-column: 2 / span 2; }
+    .map-box .stamp-in strong { font-size: 14px; }
+    .map-box .stamp-in small { font-size: 9px; }
+    .map-box .stamp-in .glyph { display: none; }
+  }
   .map-box svg.map { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 18px 30px rgba(0,0,0,.12)); }
   .india { stroke: #fff; stroke-width: 14; stroke-linejoin: round; paint-order: stroke; fill: var(--red);
     stroke-dasharray: var(--len); stroke-dashoffset: var(--len); fill-opacity: 0; transition: stroke-dashoffset 2.2s var(--ease), fill-opacity 1s .9s; }
@@ -295,6 +330,7 @@
     .client-grid { grid-template-columns: repeat(2, 1fr); }
     .client:nth-child(3n) { border-right: 1px solid var(--line); }
     .client:nth-child(2n) { border-right: 0; }
+    .client:last-child:nth-child(odd) { grid-column: 1 / -1; }
     .footprint { grid-template-columns: 1fr; }
   }
 
@@ -304,6 +340,14 @@
   .cta.playing #arena { cursor: none; }
   .cta-copy { position: relative; z-index: 2; padding-top: clamp(96px, 14svh, 150px); pointer-events: none; transition: opacity .5s var(--ease), transform .6s var(--ease); }
   .cta-copy h2 { font-size: clamp(56px, 9.5vw, 160px); }
+  @media (max-width: 760px) {
+    .cta { height: 640px; min-height: 0; }
+    .cta-copy { padding-top: 132px; }
+    .cta-copy h2 { font-size: 52px; }
+    .cta-actions { gap: 16px; }
+    .cta-hint { top: 96px; font-size: 12px; white-space: normal; text-align: center; width: calc(100% - 32px); }
+    .cta-takeover { top: 96px; left: 16px; right: auto; font-size: 12px; }
+  }
   .cta-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; pointer-events: auto; }
   .cta-mail { align-self: center; font-size: 18px; font-weight: 500; border-bottom: 1.5px solid currentColor; padding-bottom: 2px; transition: color .3s; }
   .cta-mail:hover { color: var(--red); }
@@ -332,7 +376,10 @@
   <div class="nav-links mono">
     <a href="#what">What we do</a><a href="#work">Work</a><a href="#process">How it works</a><a href="#clients">Clients</a><a href="#faq">FAQ</a>
   </div>
-  <a href="mailto:office@neuralai.in" class="btn">Contact <span class="arr">→</span></a>
+  <div class="nav-right">
+    <a href="mailto:office@neuralai.in" class="btn">Contact <span class="arr">→</span></a>
+    <button type="button" class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><i></i><i></i></button>
+  </div>
 </nav>
 
 <!-- ================= HERO ================= -->
@@ -388,7 +435,7 @@
 
     <div class="work-grid">
       <article class="proj w-8" data-reveal>
-        <div class="stage"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>unknowniitians.com</span></div>
+        <div class="stage"><div class="browser"><div class="chrome-bar"><i></i><i></i><i></i><span>unknowniitians.com</span></div>
           <div class="shot"><img src="assets/work/ui.jpg" alt="Unknown IITians website" loading="lazy"></div></div></div>
         <div class="meta"><div><h3>Unknown IITians</h3><div class="cat">EdTech platform</div></div><a href="https://www.unknowniitians.com/" target="_blank" rel="noopener">unknowniitians.com ↗</a></div>
       </article>
@@ -404,19 +451,19 @@
       </article>
 
       <article class="proj w-8" data-reveal style="transition-delay:.1s">
-        <div class="stage"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>quizspacee.com</span></div>
+        <div class="stage"><div class="browser"><div class="chrome-bar"><i></i><i></i><i></i><span>quizspacee.com</span></div>
           <div class="shot"><img src="assets/work/quiz.jpg" alt="Quiz Space website" loading="lazy"></div></div></div>
         <div class="meta"><div><h3>Quiz Space</h3><div class="cat">Exam practice platform</div></div><a href="https://quizspacee.com/" target="_blank" rel="noopener">quizspacee.com ↗</a></div>
       </article>
 
       <article class="proj w-6" data-reveal>
-        <div class="stage"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>ssp.unknowniitians.com</span></div>
+        <div class="stage"><div class="browser"><div class="chrome-bar"><i></i><i></i><i></i><span>ssp.unknowniitians.com</span></div>
           <div class="shot"><img src="assets/work/erp.jpg" alt="Student Service Portal ERP" loading="lazy"></div></div></div>
         <div class="meta"><div><h3>Student Service Portal</h3><div class="cat">ERP system</div></div><a href="https://ssp.unknowniitians.com/" target="_blank" rel="noopener">ssp.unknowniitians.com ↗</a></div>
       </article>
 
       <article class="proj w-6" data-reveal style="transition-delay:.1s">
-        <div class="stage"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>dmrv-iota.vercel.app/registry-public</span></div>
+        <div class="stage"><div class="browser"><div class="chrome-bar"><i></i><i></i><i></i><span>dmrv-iota.vercel.app/registry-public</span></div>
           <div class="shot"><img src="assets/work/acres.jpg" alt="ACRES dMRV public credit registry" loading="lazy"></div></div></div>
         <div class="meta"><div><h3>ACRES dMRV</h3><div class="cat">Climate tech, carbon credit tracking</div></div><a href="https://dmrv-iota.vercel.app/" target="_blank" rel="noopener">dmrv-iota.vercel.app ↗</a></div>
       </article>
@@ -597,6 +644,12 @@
 
   /* ---------- nav ---------- */
   const nav = document.getElementById("nav");
+  /* ---------- nav: phone menu ---------- */
+  const menuBtn = document.getElementById("menuBtn");
+  const setMenu = open => { nav.classList.toggle("open", open); menuBtn.setAttribute("aria-expanded", open); menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu"); };
+  menuBtn.addEventListener("click", () => setMenu(!nav.classList.contains("open")));
+  document.querySelectorAll(".nav-links a").forEach(a => a.addEventListener("click", () => setMenu(false)));
+
   addEventListener("scroll", () => nav.classList.toggle("scrolled", scrollY > 40), { passive: true });
 
   /* ---------- reveal ---------- */

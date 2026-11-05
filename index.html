@@ -214,6 +214,10 @@
   .phone { height: 100%; aspect-ratio: 9 / 19; max-height: 460px; background: var(--ink); border-radius: 38px; padding: 9px; box-shadow: 0 24px 50px -18px rgba(0,0,0,.35); position: relative; transition: transform .7s var(--ease); }
   .phone::before { content: ""; position: absolute; top: 16px; left: 50%; transform: translateX(-50%); width: 30%; height: 18px; border-radius: 12px; background: var(--ink); z-index: 2; }
   .phone .shot { aspect-ratio: auto; height: 100%; border-radius: 30px; }
+  /* live embed renders at a real phone width, then scales down to the frame */
+  .shot.live iframe { position: absolute; top: 0; left: 0; width: 390px; border: 0; transform-origin: 0 0; opacity: 0; transition: opacity .6s; background: #fff; }
+  .shot.live.ready iframe { opacity: 1; }
+  @media (hover: none) { .shot.live iframe { pointer-events: none; } }
 
   /* projects without a public link yet */
   .stage.dark { background: var(--ink); color: #fff; place-items: stretch; padding: 36px; }
@@ -452,8 +456,8 @@
       </article>
 
       <article class="proj w-4" data-reveal style="transition-delay:.1s">
-        <div class="stage"><div class="phone"><div class="shot"><img src="assets/work/divasya.jpg" alt="Divasya mobile app" loading="lazy"></div></div></div>
-        <div class="meta"><div><h3>Divasya</h3><div class="cat">Spiritual tech</div></div><a href="https://divasya-seven.vercel.app/" target="_blank" rel="noopener">divasya-seven.vercel.app ↗</a></div>
+        <div class="stage"><div class="phone"><div class="shot live"><img src="assets/work/divasya.jpg" alt="Divasya mobile app" loading="lazy"><iframe data-src="https://divasya-seven.vercel.app/" title="Divasya app, live" loading="lazy" tabindex="-1"></iframe></div></div></div>
+        <div class="meta"><div><h3>Divasya</h3><div class="cat">Spiritual tech</div></div><a href="https://divasya-seven.vercel.app/" target="_blank" rel="noopener">Open the app ↗</a></div>
       </article>
 
       <article class="proj w-4" data-reveal>
@@ -474,9 +478,9 @@
       </article>
 
       <article class="proj w-6" data-reveal style="transition-delay:.1s">
-        <div class="stage"><div class="browser"><div class="chrome-bar"><i></i><i></i><i></i><span>dmrv-iota.vercel.app/registry-public</span></div>
+        <div class="stage"><div class="browser"><div class="chrome-bar"><i></i><i></i><i></i><span>ACRES dMRV · Public credit registry</span></div>
           <div class="shot"><img src="assets/work/acres.jpg" alt="ACRES dMRV public credit registry" loading="lazy"></div></div></div>
-        <div class="meta"><div><h3>ACRES dMRV</h3><div class="cat">Climate tech, carbon credit tracking</div></div><a href="https://dmrv-iota.vercel.app/" target="_blank" rel="noopener">dmrv-iota.vercel.app ↗</a></div>
+        <div class="meta"><div><h3>ACRES dMRV</h3><div class="cat">Climate tech, carbon credit tracking</div></div><a href="https://dmrv-iota.vercel.app/" target="_blank" rel="noopener">View live ↗</a></div>
       </article>
 
       <article class="proj w-4" data-reveal>
@@ -1298,7 +1302,7 @@
   /* ---------- work: previews scroll through the real page on hover ---------- */
   document.querySelectorAll(".proj").forEach(proj => {
     const shot = proj.querySelector(".shot"), img = shot && shot.querySelector("img");
-    if (!img) return;
+    if (!img || shot.classList.contains("live")) return;
     const play = () => {
       const dist = Math.max(0, img.offsetHeight - shot.clientHeight);
       img.style.transition = `transform ${Math.max(1.2, dist / 260)}s cubic-bezier(.45,0,.55,1)`;
@@ -1312,6 +1316,25 @@
       const io = new IntersectionObserver(([en]) => { if (en.isIntersecting) { play(); io.disconnect(); } }, { threshold: .6 });
       io.observe(proj);
     }
+  });
+
+  /* ---------- work: live phone embeds ---------- */
+  document.querySelectorAll(".shot.live").forEach(shot => {
+    const frame = shot.querySelector("iframe");
+    const fit = () => {
+      const k = shot.clientWidth / 390;
+      frame.style.transform = `scale(${k})`;
+      frame.style.height = (shot.clientHeight / k) + "px";
+    };
+    const io = new IntersectionObserver(([en]) => {
+      if (!en.isIntersecting) return;
+      io.disconnect();
+      fit();
+      frame.addEventListener("load", () => shot.classList.add("ready"), { once: true });
+      frame.src = frame.dataset.src;
+    }, { rootMargin: "300px" });
+    io.observe(shot);
+    addEventListener("resize", fit);
   });
 
   /* ---------- count-up numbers ---------- */

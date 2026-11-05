@@ -162,9 +162,11 @@
   .stat:last-child { border-right: 0; }
   .stat b { font-size: clamp(72px, 9vw, 140px); font-weight: 600; letter-spacing: -.05em; line-height: .9; }
   .stat span { color: var(--mute); font-size: 17px; }
+  .stat b.stat-text { font-size: clamp(32px, 3.6vw, 56px); letter-spacing: -.035em; line-height: 1.05; margin-top: auto; }
   @media (max-width: 760px) {
     .stat { padding: 36px 0 32px 14px; gap: 6px; }
     .stat b { font-size: 56px; }
+    .stat b.stat-text { font-size: 19px; line-height: 1.2; }
     .stat span { font-size: 13px; line-height: 1.3; }
   }
 
@@ -506,8 +508,8 @@
 <section class="stats">
   <div class="wrap stats-row">
     <div class="stat" data-reveal><b data-count="4">0</b><span>State governments</span></div>
-    <div class="stat" data-reveal style="transition-delay:.1s"><b data-count="9">0</b><span>Clients and partners</span></div>
-    <div class="stat" data-reveal style="transition-delay:.2s"><b data-count="9">0</b><span>Products built</span></div>
+    <div class="stat" data-reveal style="transition-delay:.1s"><b data-count="30" data-suffix="+">0</b><span>Clients and partners</span></div>
+    <div class="stat" data-reveal style="transition-delay:.2s"><b class="stat-text">IIT · Caltech<br>Stanford</b><span>Where our team comes from</span></div>
   </div>
 </section>
 
@@ -1305,7 +1307,7 @@
     const el = en.target, to = +el.dataset.count, t0 = performance.now();
     (function tick(now) {
       const k = Math.min(1, (now - t0) / 1400);
-      el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3)));
+      el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))) + (k === 1 ? el.dataset.suffix || "" : "");
       if (k < 1) requestAnimationFrame(tick);
     })(t0);
   }), { threshold: .6 });

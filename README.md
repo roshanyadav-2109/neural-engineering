@@ -1,6 +1,6 @@
-# Neural Engineering
+# Eternity
 
-Single-page website for Neural Engineering. Plain HTML, CSS and JavaScript, no build step.
+Single-page website for Eternity, a subsidiary of Neural AI. Plain HTML, CSS and JavaScript, no build step.
 
 ## Run locally
 
